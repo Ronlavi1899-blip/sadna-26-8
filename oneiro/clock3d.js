@@ -4,41 +4,42 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-function dialTexture(maxAniso) {
+function dialTexture(maxAniso, dark) {
+  const INK = dark ? '#e8e6e1' : '#1e1e1c', INK2 = dark ? 'rgba(232,230,225,' : 'rgba(30,30,28,';
   const S = 2048, c = document.createElement('canvas'); c.width = c.height = S;
   const g = c.getContext('2d'), R = S / 2;
   g.translate(R, R);
   const grd = g.createRadialGradient(0, -R * .2, R * .1, 0, 0, R);
-  grd.addColorStop(0, '#f7f6f2'); grd.addColorStop(.85, '#efede8'); grd.addColorStop(1, '#e4e1db');
+  if (dark) { grd.addColorStop(0, '#2a2b2e'); grd.addColorStop(.85, '#222326'); grd.addColorStop(1, '#1a1b1d'); } else { grd.addColorStop(0, '#f7f6f2'); grd.addColorStop(.85, '#efede8'); grd.addColorStop(1, '#e4e1db'); }
   g.fillStyle = grd; g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.fill();
   // fine outer track
-  g.strokeStyle = 'rgba(30,30,28,.55)'; g.lineWidth = 2.5;
+  g.strokeStyle = INK2 + '.55)'; g.lineWidth = 2.5;
   g.beginPath(); g.arc(0, 0, R * .955, 0, Math.PI * 2); g.stroke();
   for (let i = 0; i < 60; i++) {
     const a = i / 60 * Math.PI * 2, hour = i % 5 === 0;
     const r1 = R * .945, r2 = hour ? R * .80 : R * .905;
-    g.strokeStyle = hour ? '#1e1e1c' : 'rgba(30,30,28,.7)';
+    g.strokeStyle = hour ? INK : INK2 + '.7)';
     g.lineWidth = hour ? (i === 0 ? 0 : 16) : 4; g.lineCap = 'butt';
     if (g.lineWidth) { g.beginPath(); g.moveTo(Math.sin(a) * r1, -Math.cos(a) * r1); g.lineTo(Math.sin(a) * r2, -Math.cos(a) * r2); g.stroke(); }
   }
   // twin bars at 12
-  g.fillStyle = '#1e1e1c';
+  g.fillStyle = INK;
   g.fillRect(-26, -R * .945, 14, R * .145); g.fillRect(12, -R * .945, 14, R * .145);
-  g.fillStyle = '#1e1e1c'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillStyle = INK; g.textAlign = 'center'; g.textBaseline = 'middle';
   g.font = '300 74px "Helvetica Neue", Helvetica, Arial, sans-serif';
   try { g.letterSpacing = '26px'; } catch (e) {}
   g.fillText('ONEIRO', 13, -R * .36);
   g.font = '400 30px "Helvetica Neue", Helvetica, Arial, sans-serif';
   try { g.letterSpacing = '12px'; } catch (e) {}
-  g.fillStyle = 'rgba(30,30,28,.55)';
+  g.fillStyle = INK2 + '.55)';
   g.fillText('DREAM RECORDER', 6, R * .40);
   g.fillStyle = '#d9572b'; g.beginPath(); g.arc(0, R * .50, 9, 0, Math.PI * 2); g.fill();
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = maxAniso; return t;
 }
 
-function grilleTexture() {
+function grilleTexture(dark) {
   const W = 1024, H = 256, c = document.createElement('canvas'); c.width = W; c.height = H;
-  const g = c.getContext('2d'); g.fillStyle = '#3a3936';
+  const g = c.getContext('2d'); g.fillStyle = dark ? '#151517' : '#3a3936';
   for (let y = 0; y < 5; y++) for (let x = 0; x < 22; x++) {
     g.beginPath(); g.arc(46 + x * 44 + (y % 2) * 22, 40 + y * 44, 12, 0, Math.PI * 2); g.fill();
   }
@@ -60,56 +61,56 @@ export function createClock(canvas, opts = {}) {
 
   const camera = new THREE.PerspectiveCamera(26, 1, .1, 300);
   camera.position.set(opts.camX ?? 16, 10.5, 47);
-  const target = new THREE.Vector3(0, -.8, 0);
+  const target = new THREE.Vector3(0, -.3, 0);
   camera.lookAt(target);
 
   const aniso = renderer.capabilities.getMaxAnisotropy();
+  const G = opts.finish === 'graphite';
   const M = {
-    body: new THREE.MeshPhysicalMaterial({ color: 0xdedcd7, roughness: .6, metalness: 0, clearcoat: .3, clearcoatRoughness: .45 }),
-    plinth: new THREE.MeshStandardMaterial({ color: 0xb9b5ad, roughness: .7 }),
+    body: new THREE.MeshPhysicalMaterial({ color: G ? 0x36373a : 0xd9d8d4, roughness: G ? .7 : .78, metalness: 0, clearcoat: .1, clearcoatRoughness: .6 }),
+    plinth: new THREE.MeshStandardMaterial({ color: 0x2a2a2b, roughness: .8 }),
     champagne: new THREE.MeshStandardMaterial({ color: 0xd4d3cf, metalness: 1, roughness: .32, envMapIntensity: 1.4 }),
-    hand: new THREE.MeshStandardMaterial({ color: 0x1b1b1a, metalness: .1, roughness: .5 }),
+    hand: new THREE.MeshStandardMaterial({ color: G ? 0xeeede9 : 0x1b1b1a, metalness: .1, roughness: .5 }),
     second: new THREE.MeshStandardMaterial({ color: 0xd9572b, metalness: .2, roughness: .45 }),
-    diffuser: new THREE.MeshStandardMaterial({ color: 0xd9d5ce, roughness: .9, emissive: 0xffa25e, emissiveIntensity: 0 }),
-    led: new THREE.MeshStandardMaterial({ color: 0xcfcac2, roughness: .6, emissive: 0xff3b2f, emissiveIntensity: 0 }),
+    diffuser: new THREE.MeshStandardMaterial({ color: G ? 0x2c2d30 : 0xcfccc6, roughness: .9, emissive: 0xffa25e, emissiveIntensity: 0 }),
+    led: new THREE.MeshStandardMaterial({ color: G ? 0x2c2d30 : 0xc4c1bb, roughness: .6, emissive: 0xff3b2f, emissiveIntensity: 0 }),
     glass: new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: .03, metalness: 0, transparent: true, opacity: .16, clearcoat: 1, envMapIntensity: 1.6, depthWrite: false }),
   };
 
   const clock = new THREE.Group(); scene.add(clock);
   const add = (geo, mat, cast = true, recv = true) => { const m = new THREE.Mesh(geo, mat); m.castShadow = cast; m.receiveShadow = recv; clock.add(m); return m; };
 
-  add(new RoundedBoxGeometry(16, 16, 7, 8, 2.1), M.body);
-  const pl = add(new RoundedBoxGeometry(13.4, 1, 5.4, 4, .35), M.plinth); pl.position.y = -8.25;
+  add(new RoundedBoxGeometry(16, 16, 5.2, 10, 2.6), M.body);
+  const pl = add(new RoundedBoxGeometry(9, .4, 3, 4, .15), M.plinth); pl.position.y = -8.1;
 
-  const FZ = 3.5; // front face
-  const diff = add(new THREE.RingGeometry(5.5, 5.82, 160), M.diffuser, false); diff.position.z = FZ + .006;
-  const bez = add(new THREE.TorusGeometry(5.2, .2, 32, 180), M.champagne); bez.position.z = FZ + .08;
-  const dial = add(new THREE.CircleGeometry(5.14, 160), new THREE.MeshStandardMaterial({ map: dialTexture(aniso), roughness: .85 }), false); dial.position.z = FZ + .03;
+  const FZ = 2.6; // front face
+  const diff = add(new THREE.RingGeometry(5.2, 5.38, 160), M.diffuser, false); diff.position.z = FZ + .006;
+  const bez = add(new THREE.TorusGeometry(5.0, .07, 24, 180), M.champagne); bez.position.z = FZ + .03;
+  const dial = add(new THREE.CircleGeometry(4.98, 160), new THREE.MeshStandardMaterial({ map: dialTexture(aniso, G), roughness: .85 }), false); dial.position.z = FZ + .012;
 
   function hand(w, len, back, depth, mat, z) {
     const geo = new THREE.BoxGeometry(w, len + back, depth); geo.translate(0, (len - back) / 2, 0);
     const m = add(geo, mat, true, false); m.position.z = z; return m;
   }
-  const hHour = hand(.32, 2.7, .4, .05, M.hand, FZ + .16);
-  const hMin = hand(.22, 4.1, .5, .05, M.hand, FZ + .24);
-  const hSec = hand(.06, 4.4, 1.1, .03, M.second, FZ + .31);
+  const hHour = hand(.28, 2.6, .4, .05, M.hand, FZ + .16);
+  const hMin = hand(.2, 3.95, .5, .05, M.hand, FZ + .24);
+  const hSec = hand(.055, 4.3, 1.1, .03, M.second, FZ + .31);
   const cap = add(new THREE.CylinderGeometry(.3, .3, .14, 48), M.champagne); cap.rotation.x = Math.PI / 2; cap.position.z = FZ + .36;
 
-  const R = 22, th = Math.asin(5.22 / R);
+  const R = 40, th = Math.asin(5.02 / R);
   const dome = new THREE.Mesh(new THREE.SphereGeometry(R, 160, 24, 0, Math.PI * 2, 0, th), M.glass);
-  dome.rotation.x = Math.PI / 2; dome.position.z = FZ + .12 - R * Math.cos(th); dome.renderOrder = 5; clock.add(dome);
+  dome.rotation.x = Math.PI / 2; dome.position.z = FZ + .05 - R * Math.cos(th); dome.renderOrder = 5; clock.add(dome);
 
   // top: crown record button + speaker grille
   const TOP = 8.0;
-  const crown = add(new THREE.CylinderGeometry(1.0, 1.0, .75, 96), M.champagne); crown.position.set(4.1, TOP + .36, .1);
-  const collar = add(new THREE.CylinderGeometry(.82, .9, .2, 64), M.plinth); collar.position.set(4.1, TOP + .05, .1);
-  const led = add(new THREE.TorusGeometry(1.2, .055, 16, 96), M.led, false); led.rotation.x = Math.PI / 2; led.position.set(4.1, TOP + .01, .1);
-  const gr = add(new THREE.PlaneGeometry(7.2, 1.8), new THREE.MeshStandardMaterial({ map: grilleTexture(), transparent: true, roughness: .9 }), false);
-  gr.rotation.x = -Math.PI / 2; gr.position.set(-2.1, TOP + .004, .1);
+  const crown = add(new THREE.CylinderGeometry(.85, .85, .16, 96), M.champagne); crown.position.set(4.0, TOP + .07, 0);
+  const led = add(new THREE.TorusGeometry(1.02, .05, 16, 96), M.led, false); led.rotation.x = Math.PI / 2; led.position.set(4.0, TOP + .005, 0);
+  const gr = add(new THREE.PlaneGeometry(6.4, 1.6), new THREE.MeshStandardMaterial({ map: grilleTexture(G), transparent: true, roughness: .9 }), false);
+  gr.rotation.x = -Math.PI / 2; gr.position.set(-2.0, TOP + .004, 0);
 
   // floor + lights
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.ShadowMaterial({ opacity: .2 }));
-  floor.rotation.x = -Math.PI / 2; floor.position.y = -8.75; floor.receiveShadow = true; scene.add(floor);
+  floor.rotation.x = -Math.PI / 2; floor.position.y = -8.3; floor.receiveShadow = true; scene.add(floor);
   const key = new THREE.DirectionalLight(0xffffff, 2.0); key.position.set(-14, 24, 20); key.castShadow = true;
   key.shadow.mapSize.set(2048, 2048); Object.assign(key.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 80 });
   key.shadow.bias = -.0004; key.shadow.normalBias = .03; scene.add(key);

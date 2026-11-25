@@ -79,23 +79,27 @@ textarea{width:100%;min-height:104px;font:inherit;font-size:16px;color:var(--ink
 .hint3d{position:absolute;top:14px;inset-inline-start:18px;font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;opacity:.55}
 
 /* phone */
-.phone{border-radius:44px;padding:11px;background:#e3e1dc;box-shadow:0 1px 0 #fff inset,0 30px 60px rgba(27,27,26,.12);max-width:360px;width:100%;margin-inline:auto}
-.screen{border-radius:34px;background:var(--card);min-height:660px;padding:20px 20px 24px;display:grid;gap:14px;align-content:start}
+.phone{border-radius:44px;padding:11px;background:#1c1d20;box-shadow:0 1px 0 #fff inset,0 30px 60px rgba(27,27,26,.12);max-width:360px;width:100%;margin-inline:auto}
+.screen{border-radius:34px;background:#0e0f11;color:#ecebe7;min-height:660px;padding:20px 20px 24px;display:grid;gap:14px;align-content:start}
 .island{width:96px;height:26px;border-radius:99px;background:#111;margin:-6px auto 6px}
 .appbar{display:flex;justify-content:space-between;align-items:center}
 .appbar .logo{font-family:var(--f-mono);letter-spacing:.38em;font-size:11px}
-.tag{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;padding:2px 9px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.tag{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;padding:2px 9px;border-radius:99px;border:1px solid #2e2f33;color:#a3a19b}
+.ring{display:flex;gap:14px;align-items:center}
+.ring svg{width:84px;height:84px;flex:none}
+.ring .rt{display:grid;gap:0}
+.ring .rt b{font-family:var(--f-mono);font-weight:300;font-size:13px;color:#a3a19b;letter-spacing:.08em}
 .tag.live{color:var(--accent);border-color:rgba(217,87,43,.4)}
 .ptitle{font-weight:300;font-size:25px;line-height:1.2;letter-spacing:-.01em}
-.pdream{font-size:14px;color:var(--muted);line-height:1.6}
+.pdream{font-size:14px;color:#a3a19b;line-height:1.6}
 .pills{display:flex;flex-wrap:wrap;gap:6px}
-.pills span{font-size:12px;padding:3px 10px;border-radius:99px;background:var(--stone)}
-.pills.emo span{background:none;border:1px solid var(--line)}
-.blk{display:grid;gap:4px;font-size:14.5px;padding-top:12px;border-top:1px solid var(--line)}
+.pills span{font-size:12px;padding:3px 10px;border-radius:99px;background:#222326}
+.pills.emo span{background:none;border:1px solid #2e2f33}
+.blk{display:grid;gap:4px;font-size:14.5px;padding-top:12px;border-top:1px solid #26272b}
 .blk .k{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase}
 .blk.insight{border-top:0;background:linear-gradient(135deg,rgba(242,164,107,.18),rgba(242,164,107,.05));border-radius:14px;padding:12px 14px}
 .loading{display:flex;gap:6px;justify-content:center;padding:48px 0 8px}
-.loading i{width:7px;height:7px;border-radius:50%;background:var(--ink);animation:pulse 1.2s infinite}
+.loading i{width:7px;height:7px;border-radius:50%;background:#ecebe7;animation:pulse 1.2s infinite}
 .loading i:nth-child(2){animation-delay:.2s}.loading i:nth-child(3){animation-delay:.4s}
 @keyframes pulse{50%{opacity:.15}}
 .source{font-size:11px;color:var(--faint);text-align:center}
@@ -161,9 +165,26 @@ caption{text-align:start;font-weight:400;font-size:20px;padding-bottom:12px}
 .v1{background:var(--ink);color:var(--paper)}.v2{border:1px solid var(--line);color:var(--muted)}
 .honest{background:var(--card);border-radius:24px;padding:28px;display:grid;gap:12px;margin-top:56px}
 .honest ul{margin:0;padding-inline-start:18px;display:grid;gap:8px;color:var(--muted);font-size:15px}
+.refs{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.ref{background:var(--card);border-radius:24px;padding:26px;display:grid;gap:10px;align-content:start}
+.ref .from{font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;color:var(--faint);text-transform:uppercase}
+.ref .take{border-top:1px solid var(--line);padding-top:12px;font-size:15px}
+.ref .take b{color:var(--accent);font-weight:500}
+.finishes{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.finish{border-radius:24px;overflow:hidden;background:radial-gradient(ellipse at 50% 35%,#f3f1ed,var(--stone) 75%);display:grid}
+.finish img{width:100%;height:auto;display:block}
+.finish .cap{padding:0 22px 20px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.dark-band{background:#0e0f11;color:#ecebe7;border-radius:32px;padding-block:72px;padding-inline:max(20px,4vw);margin-block:24px}
+.dark-band .muted,.dark-band .sec-head p{color:#a3a19b}
+.dark-band .label{color:#7d7b75}
+.scores{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.score{display:grid;gap:10px;justify-items:start}
+.score svg{width:120px;height:120px}
+.score .big{font-family:var(--f-mono);font-weight:300;font-size:15px;color:#a3a19b}
 footer{padding-block:40px 64px;border-top:1px solid var(--line);color:var(--faint);font-size:13px}
 
 @media (max-width:900px){
+  .refs,.finishes,.scores{grid-template-columns:1fr}
   .sim,.report,.tables,.up{grid-template-columns:1fr}
   .journey,.specs,.figs{grid-template-columns:1fr 1fr}
   .specs div:nth-child(3),.fig:nth-child(3){border-inline-start:0}
@@ -189,19 +210,28 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);color:var(--fain
 <header class="hero">
   <span class="label">Dream Recorder · Model 01</span>
   <h1>השעון שזוכר<br>את החלומות שלך</h1>
-  <p class="lead">מחוגים אמיתיים מתחת לזכוכית כיפתית, וגוף בגוון אבן בהירה. מסביב לחוגה יש טבעת אור שמדמה זריחה. למעלה יש כפתור כתר מאלומיניום: לוחצים, מספרים את החלום, והוא מחכה לכם מפורש באפליקציה.</p>
+  <p class="lead">חפץ אחד ליד המיטה, בלי מסך ובלי התראות. מחוגים אמיתיים, טבעת אור שמעירה כמו זריחה, וכפתור אחד מאלומיניום: לוחצים ומספרים את החלום. כל בוקר מחכים לכם באפליקציה פירוש, תובנה וציון חלימה.</p>
   <div class="price-row">
     <a class="cta" href="#sim">לחוות בוקר אחד</a>
-    <span class="price">₪1,190</span>
+    <span class="price">₪49 לחודש, השעון כלול · או ₪1,190</span>
   </div>
   <div class="stage"><img src="oneiro-clock.png" width="1600" height="1257" alt="ONEIRO: שעון מעורר לבן-אפרפר עם חוגת מחוגים, טבעת מאלומיניום, זכוכית כיפתית ומחוג שניות כתום"></div>
   <div class="specs">
     <div><span class="v">מחוגים בתנועה שקטה</span><span class="k">מנוע צעד בלי תקתוק, מתכוונן לבד דרך Wi‑Fi</span></div>
     <div><span class="v">טבעת אור זריחה</span><span class="k">20 דקות מסגול לענבר לפני הצליל</span></div>
     <div><span class="v">כפתור כתר להקלטה</span><span class="k">מקליט רק כשלוחצים, עם נורית אדומה</span></div>
-    <div><span class="v">16 × 16 × 7 ס״מ</span><span class="k">אלומיניום עם צבע אבקה וזכוכית מינרלית</span></div>
+    <div><span class="v">אבן או גרפיט</span><span class="k">גוף מט 16 × 16 × 5.2 ס״מ, אלומיניום וזכוכית</span></div>
   </div>
 </header>
+
+<section id="refs">
+  <div class="sec-head"><span class="label">השראה</span><h2>מה לקחנו משלושה מוצרים שעבדו</h2><p>ONEIRO נמצא בדיוק בצומת שבו המוצרים האלה הצליחו: חפץ פיזי שמשנה הרגל, וולנס בלי מסך ומנוי של נתונים. ככה לוקחים מכל אחד את העיקרון, בלי להעתיק אותו.</p></div>
+  <div class="refs">
+    <div class="ref"><span class="from">Brick</span><h3>חפץ פשוט שמשנה הרגל</h3><p class="muted">קובייה שלא עושה כלום חוץ מלנעול את הטלפון. ההצלחה שלה היא בתנועה הפיזית: מחליטים עם הגוף, לא עם עוד אפליקציה.</p><p class="take"><b>אצלנו:</b> בוקר בלי טלפון. האפליקציות המסיחות נשארות נעולות עד שלוחצים על הכתר ומספרים את החלום, או עד 20 דקות אחרי ההשכמה.</p></div>
+    <div class="ref"><span class="from">WHOOP</span><h3>בלי מסך, ציון אחד, מנוי</h3><p class="muted">צמיד בלי מסך שמחזיר כל בוקר מספר אחד שאכפת לך ממנו. החומרה כלולה בחברות חודשית, והעסק הוא המנוי.</p><p class="take"><b>אצלנו:</b> ציון חלימה יומי, מנוי חודשי שכולל את השעון, ושום מסך על השעון עצמו.</p></div>
+    <div class="ref"><span class="from">Apple</span><h3>עיצוב ומערכת שלמה</h3><p class="muted">מוצר שנראה פשוט כי כל פרט הוחלט. ומוצרים שמדברים זה עם זה, כמו נתוני שינה מהשעון שנכנסים ל־Health.</p><p class="take"><b>אצלנו:</b> שני גימורים בלבד, אריזה שהיא חוויה, וסנכרון עם Apple Health, Apple Watch, Oura ו־WHOOP כדי לדעת מתי אתם בשלב חלימה.</p></div>
+  </div>
+</section>
 
 <section id="sim">
   <div class="sec-head">
@@ -256,13 +286,22 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);color:var(--fain
 </section>
 
 <section id="design">
-  <div class="sec-head"><span class="label">עיצוב</span><h2>ישן וחדש באותו חפץ</h2><p>הצורה שואבת משעוני שולחן של שנות ה־60: חוגה עגולה, מחוגים דקים, כיפת זכוכית. הטכנולוגיה מוסתרת מאחוריה. אין מסך ואין לוגו בולט, יש רק אור, קול וכפתור אחד.</p></div>
-  <div class="mats">
-    <div class="mat"><span class="swatch" style="background:#dedcd7;box-shadow:inset 0 0 0 1px var(--line)"></span><h3>גוף בגוון אבן</h3><p class="muted">אלומיניום בעיבוד שבבי וצבע אבקה מט בגוון לבן־אפרפר. כבד ביד ונעים למגע, לא פלסטיק.</p></div>
-    <div class="mat"><span class="swatch" style="background:linear-gradient(135deg,#f1f0ed,#a9a8a3)"></span><h3>טבעת וכתר מאלומיניום</h3><p class="muted">אלומיניום מוברש שמחזיר את אור הבוקר. הכתר נלחץ עם קליק מכני רך, ונורית אדומה סביבו מראה שמקליטים.</p></div>
-    <div class="mat"><span class="swatch" style="background:var(--accent)"></span><h3>מחוג שניות כתום</h3><p class="muted">הצבע היחיד על החוגה. הוא חוזר גם באפליקציה, באריזה ובשיווק.</p></div>
+  <div class="sec-head"><span class="label">עיצוב</span><h2>ישן וחדש באותו חפץ</h2><p>החוגה והמחוגים לקוחים משעוני שולחן קלאסיים. הגוף הוא אובייקט רך ושקט, ממשפחת המוצרים שמכירים מוולנס ומטכנולוגיה. אין מסך, אין התראות ויש כפתור אחד.</p></div>
+  <div class="finishes">
+    <div class="finish"><img src="oneiro-clock.png" width="1600" height="1257" alt="ONEIRO בגימור אבן: גוף לבן־אפרפר מט וחוגה בהירה"><div class="cap"><h3>אבן</h3><span class="muted">גוף מט לבן־אפרפר, מחוגים שחורים</span></div></div>
+    <div class="finish"><img src="oneiro-graphite.png" width="1600" height="1257" alt="ONEIRO בגימור גרפיט: גוף אפור כהה וחוגה כהה עם מחוגים לבנים"><div class="cap"><h3>גרפיט</h3><span class="muted">גוף אפור כהה, מחוגים לבנים, נעלם בחדר חשוך</span></div></div>
   </div>
+  <p class="note" style="margin-top:18px">בשני הגימורים מחוג השניות כתום, וזה הצבע היחיד. הטבעת, הכתר והמסגרת הדקה עשויים מאלומיניום מוברש. אין לוגו על הגוף, השם מופיע רק על החוגה.</p>
 </section>
+
+<div class="dark-band">
+  <div class="sec-head"><span class="label">האפליקציה</span><h2>מספר אחד כל בוקר</h2><p>במקום לגלול, מקבלים שלושה מדדים פשוטים. הם מגיעים מהשעון, מההקלטה ומהשעון החכם אם יש לכם.</p></div>
+  <div class="scores">
+    <div class="score"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#26272b" stroke-width="8"/><circle cx="60" cy="60" r="50" fill="none" stroke="#d9572b" stroke-width="8" stroke-linecap="round" stroke-dasharray="257.6 314.2" transform="rotate(-90 60 60)"/><text x="60" y="68" text-anchor="middle" fill="#ecebe7" font-family="IBM Plex Mono, monospace" font-size="28" font-weight="300">82</text></svg><h3>ציון חלימה</h3><p class="muted">כמה מהחלום נשמר: אורך, פרטים, רגשות ודמויות. משתפר עם התרגול, וזה בדיוק מה שמחזיר אנשים כל בוקר.</p></div>
+    <div class="score"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#26272b" stroke-width="8"/><circle cx="60" cy="60" r="50" fill="none" stroke="#f2a46b" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.7 314.2" transform="rotate(-90 60 60)"/><text x="60" y="68" text-anchor="middle" fill="#ecebe7" font-family="IBM Plex Mono, monospace" font-size="28" font-weight="300">68</text></svg><h3>טון רגשי</h3><p class="muted">איך החלומות מרגישים לאורך השבוע. ירידה חדה היא סימן לשים לב ללחץ או לשינה.</p></div>
+    <div class="score"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#26272b" stroke-width="8"/><circle cx="60" cy="60" r="50" fill="none" stroke="#ecebe7" stroke-width="8" stroke-linecap="round" stroke-dasharray="235.6 314.2" transform="rotate(-90 60 60)"/><text x="60" y="68" text-anchor="middle" fill="#ecebe7" font-family="IBM Plex Mono, monospace" font-size="28" font-weight="300">12</text></svg><h3>רצף ימים</h3><p class="muted">כמה בקרים ברצף סיפרתם חלום בלי לגעת בטלפון. ההרגל הוא המוצר.</p></div>
+  </div>
+</div>
 
 <section>
   <div class="sec-head"><span class="label">דוח חודשי · דוגמה</span><h2>החודש שלכם בחלומות</h2><p>אחרי חודש של הקלטות, האפליקציה מראה מה חוזר. זה הערך שאי אפשר לקבל ממחברת ליד המיטה.</p></div>
@@ -339,16 +378,24 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);color:var(--fain
 </section>
 
 <section id="biz">
-  <div class="sec-head"><span class="label">מודל עסקי</span><h2>מחיר של חפץ עיצובי, הכנסה של מנוי</h2><p>₪1,190 מציב את השעון ליד מוצרי עיצוב כמו Braun ו־Teenage Engineering, ולא ליד שעונים חכמים זולים. השעון מחזיר את עצמו עם רווח. המנוי הוא מה שבונה עסק: ה־AI עולה בערך ₪4–5 בחודש למשתמש.</p></div>
+  <div class="sec-head"><span class="label">מודל עסקי</span><h2>חברות, לא רק מוצר</h2><p>כמו ב־WHOOP, ההצעה הראשית היא מנוי חודשי שהשעון כלול בו. מי שמעדיף יכול לקנות את השעון. ה־AI עולה בערך ₪4–5 בחודש למשתמש, וכל השאר הוא תוכנה, אז ההכנסה החוזרת היא מה שבונה את שווי החברה.</p></div>
   <div class="tiers">
-    <div class="tier"><h3>השעון</h3><span class="p">₪1,190</span><ul><li>כל החומרה, אחריות לשנתיים</li><li>תמלול כל החלומות ליומן</li><li>דוח חלומות חודשי, בחינם לתמיד</li></ul></div>
-    <div class="tier hl"><h3>ONEIRO+</h3><span class="p">₪29<span style="font-size:15px"> / חודש</span></span><span class="muted" style="font-size:14px">או ₪249 לשנה · 3 חודשים חינם עם השעון</span><ul><li>פירוש ותובנה כל בוקר</li><li>מפת סמלים אישית וחלומות חוזרים</li><li>קשר בין שינה, מצב רוח וחלומות</li><li>תמונה מהחלום, פעם בשבוע</li></ul></div>
-    <div class="tier"><h3>אפליקציה בלבד</h3><span class="p">₪19<span style="font-size:15px"> / חודש</span></span><ul><li>מקליטים מהטלפון</li><li>משפך כניסה: מי שמתאהב, קונה שעון</li><li>מטפלים ומאמנים: לוח עבודה עם הסכמת המטופל, ₪120 לחודש</li></ul></div>
+    <div class="tier hl"><h3>ONEIRO Membership</h3><span class="p">₪49<span style="font-size:15px"> / חודש</span></span><span class="muted" style="font-size:14px">התחייבות ל־12 חודשים · השעון כלול · ₪0 מראש</span><ul><li>השעון בגימור לבחירה</li><li>פירוש, תובנה וציון חלימה כל בוקר</li><li>מפת סמלים ודוח חודשי</li><li>נעילת בוקר וסנכרון עם Health</li><li>שדרוג חומרה בחינם אחרי 24 חודשים</li></ul></div>
+    <div class="tier"><h3>לקנות את השעון</h3><span class="p">₪1,190</span><span class="muted" style="font-size:14px">ו־ONEIRO+ לבחירה, ₪29 לחודש</span><ul><li>כל החומרה, אחריות לשנתיים</li><li>תמלול כל החלומות ליומן</li><li>דוח חודשי בחינם לתמיד</li></ul></div>
+    <div class="tier"><h3>אפליקציה בלבד</h3><span class="p">₪19<span style="font-size:15px"> / חודש</span></span><ul><li>מקליטים מהטלפון או מהשעון החכם</li><li>משפך כניסה: מי שמתאהב, עובר לחברות</li><li>מטפלים: לוח עבודה עם הסכמת המטופל, ₪120 לחודש</li></ul></div>
   </div>
 
-  <h3 style="margin-top:56px;font-size:20px;font-weight:400">מה נשאר מכל שעון</h3>
+  <h3 style="margin-top:56px;font-size:20px;font-weight:400">מה נשאר משעון שנקנה</h3>
   <div class="wfall" id="wfall"></div>
   <p class="note">בתוספת מנוי: אם 35% מהקונים משלמים ₪249 לשנה, אחרי עמלות חנות האפליקציות וה־AI נשארים כ־₪150 לשנה מכל מנוי. זה מוסיף בערך ₪110 לכל שעון לאורך חיי הלקוח.</p>
+  <h3 style="margin-top:44px;font-size:20px;font-weight:400">ואיך נראית חברות</h3>
+  <div class="wfall">
+    <div class="wf first"><span>שנה 1: ₪49 × 12, אחרי מע״מ</span><div><div class="b" style="width:42%"></div></div><span class="num">₪498</span></div>
+    <div class="wf"><span>שעון, משלוח, שיווק, AI</span><div><div class="b" style="width:55%"></div></div><span class="num">−₪660</span></div>
+    <div class="wf"><span>שנה 1, נטו</span><div><div class="b" style="width:14%"></div></div><span class="num">−₪162</span></div>
+    <div class="wf last"><span>כל שנה מהשנה השנייה</span><div><div class="b" style="width:37%"></div></div><span class="num">+₪440</span></div>
+  </div>
+  <p class="note">בשנה הראשונה החברות מפסידה, כי השעון יוצא מראש. מהשנה השנייה כמעט הכול רווח. אם 65% מחדשים, כל חבר שווה בערך ₪310 נטו לאורך החיים שלו, ומשקיעים מעריכים הכנסה חוזרת בפי 5–8 מהכנסה שנתית. בגלל זה ההמלצה היא להתחיל במכירה רגילה בקיקסטארטר, שמכניסה מזומן למלאי, ולעבור לחברות כהצעה הראשית בשנה השנייה.</p>
 
   <div class="figs" style="margin-top:44px">
     <div class="fig"><span class="v">~₪480</span><span class="l">רווח תרומה ללקוח (שעון + מנוי)</span></div>
@@ -359,7 +406,7 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);color:var(--fain
 
   <div class="phases">
     <div class="phase"><span class="label">שלב 1</span><h3>קיקסטארטר</h3><p>יעד של $300K, במחיר מוקדם של $249. הכסף מממן את המלאי ובודק ביקוש לפני הייצור. מוצר שנראה טוב בווידאו מתאים בדיוק לפלטפורמה הזו.</p></div>
-    <div class="phase"><span class="label">שלב 2</span><h3>מכירה ישירה</h3><p>אתר עצמאי, יוצרי תוכן מעולם השינה, העיצוב והבריאות, קהילות חלימה צלולה. מתנה לחגים ולחתונות.</p></div>
+    <div class="phase"><span class="label">שלב 2</span><h3>חברות</h3><p>מעבר למנוי שכולל את השעון. שיווק דרך יוצרי תוכן מעולם הוולנס, הביו־האקינג והעיצוב, וקהילות חלימה צלולה. "בוקר בלי טלפון" הוא המסר.</p></div>
     <div class="phase"><span class="label">שלב 3</span><h3>קמעונאות עיצוב</h3><p>חנויות מוזיאונים וקונספט סטורים, מלונות בוטיק עם "חדר חלומות", מהדורות קרמיקה מוגבלות ושיתופי פעולה עם מעצבים.</p></div>
   </div>
 </section>
@@ -375,6 +422,8 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);color:var(--fain
       <li><b>טעינה אלחוטית לטלפון בבסיס<span class="v2">V2</span></b><span>הטלפון נטען מחוץ להישג יד, וזה מחזק את הרעיון של בוקר בלי מסך.</span></li>
     </ul></div>
     <div><h3 style="margin-bottom:20px;font-size:20px;font-weight:400">תוכנה</h3><ul>
+      <li><b>נעילת בוקר<span class="v1">V1</span></b><span>בהשראת Brick: עד שמספרים את החלום, אינסטגרם, טיקטוק והמייל נשארים נעולים בטלפון. זה עובד דרך Screen Time ב־iPhone ודרך Digital Wellbeing ב־Android.</span></li>
+      <li><b>סנכרון עם שעונים וטבעות<span class="v1">V1</span></b><span>Apple Watch, Oura ו־WHOOP כבר יודעים מתי אתם ב־REM. מי שיש לו כזה יכול לקנות ONEIRO Lite בלי רדאר, ב־₪890.</span></li>
       <li><b>שאלת המשך בקול<span class="v1">V1</span></b><span>אחרי שסיימתם, השעון שואל שאלה אחת: "איך הרגשת שם?" זה מוציא עוד פרטים מהזיכרון.</span></li>
       <li><b>מפת סמלים אישית<span class="v1">V1</span></b><span>בלי מילון חלומות כללי. המשמעות נבנית ממה ש"מים" אומרים אצלכם, לאורך חודשים.</span></li>
       <li><b>קשר לחיים<span class="v1">V1</span></b><span>שאלה קצרה בערב (מצב רוח, קפה, מסכים) מול החלומות והשינה. מכאן מגיעות התובנות הכי טובות.</span></li>
@@ -439,6 +488,13 @@ try {
   function el(tag,cls,text){const e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e;}
   function renderResult(dream,r,o){
     const b=$("#pBody"); b.replaceChildren(); const w=el("div"); w.style.cssText="display:grid;gap:14px";
+    const words=dream.split(/\s+/).filter(Boolean).length, sc=Math.max(20,Math.min(97,Math.round(38+words*0.9+(r.symbols||[]).length*4)));
+    const NS="http://www.w3.org/2000/svg", ring=el("div","ring"), svg=document.createElementNS(NS,"svg"); svg.setAttribute("viewBox","0 0 120 120");
+    const mk=(c,extra)=>{const n=document.createElementNS(NS,"circle"); n.setAttribute("cx","60");n.setAttribute("cy","60");n.setAttribute("r","50");n.setAttribute("fill","none");n.setAttribute("stroke",c);n.setAttribute("stroke-width","9");Object.entries(extra||{}).forEach(([k,v])=>n.setAttribute(k,v));return n;};
+    svg.append(mk("#26272b"), mk("#d9572b",{"stroke-linecap":"round","stroke-dasharray":(sc/100*314.2).toFixed(1)+" 314.2","transform":"rotate(-90 60 60)"}));
+    const tx=document.createElementNS(NS,"text"); tx.setAttribute("x","60");tx.setAttribute("y","70");tx.setAttribute("text-anchor","middle");tx.setAttribute("fill","#ecebe7");tx.setAttribute("font-size","32");tx.setAttribute("font-family","IBM Plex Mono, monospace");tx.setAttribute("font-weight","300");tx.textContent=String(sc); svg.append(tx);
+    const rt=el("div","rt"); rt.append(el("b",null,"ציון חלימה"), el("span",null,sc>=75?"זכירה חזקה. החלום נשמר כמעט במלואו.":sc>=50?"זכירה טובה. נסו לספר עוד פרט אחד מחר.":"זכירה חלקית. מחר נסו לספר לפני שזזים מהמיטה."));
+    ring.append(svg,rt); w.append(ring);
     w.append(el("div","ptitle",r.title||"החלום של הבוקר"), el("p","pdream",dream));
     const s=el("div","pills"); (r.symbols||[]).slice(0,5).forEach(x=>s.append(el("span",null,x))); w.append(s);
     const e=el("div","pills emo"); (r.emotions||[]).slice(0,4).forEach(x=>e.append(el("span",null,x))); w.append(e);

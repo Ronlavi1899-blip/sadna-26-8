@@ -5,7 +5,7 @@
 <script type="module">
 import { createClock } from './clock3d.js';
 const q=new URLSearchParams(location.search);
-const c=createClock(document.getElementById('c'),{preserve:true,pixelRatio:2,camX:+(q.get('x')||15)});
+const c=createClock(document.getElementById('c'),{preserve:true,pixelRatio:2,camX:+(q.get('x')||16),finish:q.get('f')||'stone'});
 c.setTime(10,8,36); c.setGlow(+(q.get('g')||0.55)); if(q.get('rec')) c.setRecording(true);
 c.render(); requestAnimationFrame(()=>{c.render(); window.done=true;});
 </script></body></html>
