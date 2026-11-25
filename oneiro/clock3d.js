@@ -26,9 +26,9 @@ function dialTexture(maxAniso, dark) {
   g.fillStyle = INK;
   g.fillRect(-26, -R * .945, 14, R * .145); g.fillRect(12, -R * .945, 14, R * .145);
   g.fillStyle = INK; g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.font = '300 74px "Helvetica Neue", Helvetica, Arial, sans-serif';
+  g.font = '300 66px "Helvetica Neue", Helvetica, Arial, sans-serif';
   try { g.letterSpacing = '26px'; } catch (e) {}
-  g.fillText('ONEIRO', 13, -R * .36);
+  g.fillText('EASY DREAMS', 13, -R * .36);
   g.font = '400 30px "Helvetica Neue", Helvetica, Arial, sans-serif';
   try { g.letterSpacing = '12px'; } catch (e) {}
   g.fillStyle = INK2 + '.55)';
