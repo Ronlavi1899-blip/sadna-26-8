@@ -1,0 +1,628 @@
+<title>ONEIRO Dream Clock</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700;900&family=Heebo:wght@300;400;500;700&family=IBM+Plex+Mono:wght@300;500&display=swap">
+<style>
+/* Layout: one night-to-morning scroll. Hero object, then a live bedside simulator, then the numbers. Single deliberate night look. */
+:root{
+  --night:#0f1020; --night2:#17182f; --panel:#1d1e3a; --ink:#ece6f5; --muted:#a8a2c4;
+  --amber:#ffa640; --dawn:#ef7b97; --violet:#8b7bf3; --brass:#e1bf72; --line:rgba(236,230,245,.13);
+  --good:#7fd6a8;
+  --f-display:"Frank Ruhl Libre","David Libre",Georgia,serif;
+  --f-body:"Heebo","Assistant","Segoe UI",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--night);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin-inline:auto}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+h2{font-size:clamp(28px,4.2vw,42px);font-weight:700}
+h3{font-size:20px;font-weight:700}
+p{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber)}
+.muted{color:var(--muted)}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+section{padding-block:72px;border-top:1px solid var(--line)}
+.sec-head{display:grid;gap:12px;max-width:680px;margin-bottom:36px}
+
+/* hero */
+.hero{padding-block:40px 56px;display:grid;grid-template-columns:1.05fr 1fr;gap:32px;align-items:center;border:0}
+.hero h1{font-size:clamp(44px,7vw,84px);font-weight:900;letter-spacing:-.01em}
+.hero h1 .lat{font-family:var(--f-mono);font-weight:300;font-size:.32em;letter-spacing:.5em;display:block;color:var(--brass);margin-bottom:10px}
+.hero .lead{font-size:19px;color:var(--muted);max-width:34em;margin-top:18px}
+.hero .facts{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;background:rgba(255,255,255,.03)}
+.cta{display:inline-flex;gap:10px;align-items:center;margin-top:28px;background:var(--amber);color:#1b1208;font-weight:700;
+  padding:12px 22px;border-radius:12px;text-decoration:none}
+.cta:focus-visible,button:focus-visible,textarea:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.art{min-width:0}
+.clock{width:100%;height:auto;display:block;max-width:100%}
+.clock .haloE{opacity:var(--dawn,.75);transition:opacity 5s ease}
+.clock .lever{transition:transform .4s cubic-bezier(.3,1.6,.5,1);transform-origin:440px 142px;transform:rotate(-18deg)}
+.clock.rec .lever{transform:rotate(16deg)}
+.clock .recdot{opacity:.12;transition:opacity .3s}
+.clock.rec .recdot{opacity:1;animation:blink 1s infinite}
+.clock .dawnbar{opacity:calc(.15 + var(--dawn,.75)*.85);transition:opacity 5s}
+@keyframes blink{50%{opacity:.25}}
+.caption{font-size:13px;color:var(--muted);text-align:center;margin-top:6px}
+
+/* simulator */
+.sim{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:start}
+.bedside{background:radial-gradient(ellipse at 50% 30%,var(--panel),var(--night2) 70%);border:1px solid var(--line);border-radius:28px;padding:20px;min-width:0;
+  transition:background 4s}
+.bedside.morning{background:radial-gradient(ellipse at 50% 30%,#3a2740,#1b1a33 75%)}
+.status{min-height:52px;font-size:17px;text-align:center;margin-top:8px}
+.status b{color:var(--amber);font-weight:500}
+.steps{display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.steps span{font-size:12px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.steps span.on{border-color:var(--amber);color:var(--amber)}
+.ctrls{display:grid;gap:12px;margin-top:18px}
+.btn{font:inherit;font-weight:500;cursor:pointer;border-radius:12px;padding:11px 18px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink)}
+.btn:hover{background:rgba(255,255,255,.1)}
+.btn.primary{background:var(--amber);border-color:var(--amber);color:#1b1208;font-weight:700}
+.btn.lever{background:linear-gradient(90deg,#8c6a2c,#f1d48a 40%,#c79a45 70%,#6e5020);color:#22180a;border:0;font-weight:700;touch-action:none;user-select:none}
+.btn.lever.active{filter:brightness(1.15);box-shadow:0 0 0 4px rgba(255,90,90,.35)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+textarea{width:100%;min-height:110px;font:inherit;font-size:16px;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:14px;padding:12px;resize:vertical}
+.partial{color:var(--muted);font-style:italic;min-height:1.4em;font-size:14px}
+.samples{display:flex;flex-wrap:wrap;gap:8px}
+.samples button{font:inherit;font-size:13px;cursor:pointer;border-radius:99px;padding:5px 12px;border:1px dashed var(--line);background:none;color:var(--muted)}
+.samples button:hover{color:var(--ink);border-color:var(--muted)}
+.capture[hidden]{display:none}
+
+/* phone */
+.phone{border-radius:42px;padding:12px;background:#07070d;border:1px solid #2c2b3d;box-shadow:0 30px 80px rgba(0,0,0,.5);max-width:380px;margin-inline:auto;width:100%}
+.screen{border-radius:32px;background:linear-gradient(180deg,#1a1830,#120f1f);min-height:640px;padding:22px 20px;display:grid;gap:14px;align-content:start;overflow:hidden}
+.notch{width:110px;height:24px;border-radius:99px;background:#000;margin:-8px auto 4px}
+.appbar{display:flex;justify-content:space-between;align-items:baseline}
+.appbar .logo{font-family:var(--f-mono);letter-spacing:.3em;font-size:12px;color:var(--brass)}
+.tag-example{font-size:11px;padding:2px 8px;border-radius:99px;background:rgba(139,123,243,.18);color:var(--violet)}
+.ptitle{font-family:var(--f-display);font-size:24px;font-weight:700;line-height:1.2}
+.pdream{font-size:14px;color:var(--muted);border-inline-start:2px solid var(--violet);padding-inline-start:10px}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pills span{font-size:12px;padding:3px 10px;border-radius:99px;background:rgba(255,166,64,.12);color:var(--amber)}
+.pills.emo span{background:rgba(239,123,151,.13);color:var(--dawn)}
+.card{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:16px;padding:12px 14px;font-size:14.5px;display:grid;gap:6px}
+.card .k{font-size:11px;letter-spacing:.12em;color:var(--muted)}
+.card.insight{background:linear-gradient(135deg,rgba(255,166,64,.14),rgba(239,123,151,.1));border-color:rgba(255,166,64,.3)}
+.loading{display:flex;gap:6px;justify-content:center;padding:40px 0}
+.loading i{width:8px;height:8px;border-radius:50%;background:var(--violet);animation:pulse 1.2s infinite}
+.loading i:nth-child(2){animation-delay:.2s}.loading i:nth-child(3){animation-delay:.4s}
+@keyframes pulse{50%{opacity:.2;transform:scale(.7)}}
+.source{font-size:11px;color:var(--muted);text-align:center}
+
+/* journey */
+.journey{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:j}
+.journey li{list-style:none;padding:18px;border-top:2px solid var(--line);display:grid;gap:6px;align-content:start}
+.journey li:nth-child(1){border-color:var(--violet)}.journey li:nth-child(2){border-color:var(--dawn)}.journey li:nth-child(3){border-color:var(--amber)}.journey li:nth-child(4){border-color:var(--brass)}
+.journey .t{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.journey{padding:0;margin:0}
+
+/* report */
+.report{display:grid;grid-template-columns:1fr 1fr;gap:24px;background:var(--night2);border:1px solid var(--line);border-radius:24px;padding:28px}
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:110px 1fr 28px;gap:10px;align-items:center;font-size:14px}
+.bar .tr{height:10px;border-radius:6px;background:rgba(255,255,255,.06);overflow:hidden}
+.bar .fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--violet),var(--dawn))}
+[dir=rtl] .bar .fill{background:linear-gradient(270deg,var(--violet),var(--dawn))}
+.spark text{fill:var(--muted);font-size:11px;font-family:var(--f-mono)}
+
+/* tables */
+.tables{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.tbl{overflow-x:auto;min-width:0}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:start;vertical-align:top}
+td.n,th.n{text-align:end;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--muted)}
+caption{text-align:start;font-family:var(--f-display);font-size:20px;font-weight:700;padding-bottom:10px}
+.small{font-size:13px}
+.big-figs{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px}
+.fig{border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:4px}
+.fig .v{font-family:var(--f-mono);font-size:26px;color:var(--amber);font-variant-numeric:tabular-nums}
+.fig .l{font-size:13px;color:var(--muted)}
+
+/* pricing */
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.tier{border:1px solid var(--line);border-radius:20px;padding:22px;display:grid;gap:10px;align-content:start}
+.tier.hl{border-color:var(--amber);background:rgba(255,166,64,.05)}
+.tier .price{font-family:var(--f-mono);font-size:30px}
+.tier ul{margin:0;padding-inline-start:18px;display:grid;gap:4px;font-size:14.5px}
+.waterfall{display:grid;gap:8px;margin-top:28px;max-width:720px}
+.wf{display:grid;grid-template-columns:200px 1fr 70px;gap:10px;align-items:center;font-size:14px}
+.wf .b{height:18px;border-radius:4px}
+.streams{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+.stream{padding:16px;border-inline-start:2px solid var(--violet);display:grid;gap:6px}
+
+/* upgrades */
+.up{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.up ul{list-style:none;padding:0;margin:0;display:grid;gap:14px}
+.up li{display:grid;gap:3px}
+.up li b{font-weight:500}
+.up li span{font-size:14.5px;color:var(--muted)}
+.prio{font-family:var(--f-mono);font-size:11px;padding:1px 7px;border-radius:6px;margin-inline-start:6px;vertical-align:2px}
+.prio.p1{background:rgba(127,214,168,.15);color:var(--good)}
+.prio.p2{background:rgba(139,123,243,.18);color:var(--violet)}
+.honest{background:var(--night2);border-radius:20px;padding:24px;display:grid;gap:10px;margin-top:28px}
+.honest ul{margin:0;padding-inline-start:18px;display:grid;gap:6px;color:var(--muted)}
+footer{padding-block:40px 60px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+
+@media (max-width:860px){
+  .hero,.sim,.report,.tables,.up{grid-template-columns:1fr}
+  .journey,.big-figs{grid-template-columns:1fr 1fr}
+  .tiers,.streams{grid-template-columns:1fr}
+  .hero .art{order:-1}
+}
+@media (max-width:480px){
+  .journey,.big-figs{grid-template-columns:1fr}
+  .wf{grid-template-columns:120px 1fr 56px}
+  .bar{grid-template-columns:90px 1fr 24px}
+  .screen{min-height:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div dir="rtl" lang="he" class="wrap">
+
+<!-- HERO -->
+<header class="hero">
+  <div>
+    <h1><span class="lat">ONEIRO</span>השעון שזוכר את החלומות שלך</h1>
+    <p class="lead">עץ אגוז, פליז ונורות ספרות זוהרות כמו של פעם. בפנים: אור זריחה, מנגינה שקטה, ידית הקלטה ובינה מלאכותית שמתמללת את החלום ומחזירה פירוש ותובנה לבוקר.</p>
+    <div class="facts">
+      <span class="chip">התעוררות עדינה ב־3 שלבים</span>
+      <span class="chip">ידית פליז להקלטה, בלי לגעת בטלפון</span>
+      <span class="chip">תמלול ופירוש באפליקציה</span>
+      <span class="chip">דוח חלומות חודשי</span>
+    </div>
+    <a class="cta" href="#sim">לנסות בוקר אחד עם ONEIRO</a>
+  </div>
+  <div class="art" id="heroArt">
+    <svg class="clock" id="clockTpl" viewBox="0 0 640 520" role="img" aria-label="הדמיה של שעון ONEIRO: גוף עץ אגוז, ארבע נורות ספרות כתומות, רשת בד ורמקול וידית פליז למעלה">
+      <defs>
+        <radialGradient id="g-halo" cx="50%" cy="52%" r="50%"><stop offset="0" stop-color="#ffb36b" stop-opacity=".6"/><stop offset=".45" stop-color="#e86f8f" stop-opacity=".25"/><stop offset="1" stop-color="#5b4bd6" stop-opacity="0"/></radialGradient>
+        <linearGradient id="g-wal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#93603e"/><stop offset=".5" stop-color="#623c25"/><stop offset="1" stop-color="#3a2315"/></linearGradient>
+        <linearGradient id="g-brass" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8c6a2c"/><stop offset=".35" stop-color="#f6dc96"/><stop offset=".6" stop-color="#c79a45"/><stop offset="1" stop-color="#6e5020"/></linearGradient>
+        <linearGradient id="g-glass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c2536"/><stop offset="1" stop-color="#0b090f"/></linearGradient>
+        <linearGradient id="g-tube" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset=".22" stop-color="#fff" stop-opacity=".04"/><stop offset=".8" stop-color="#fff" stop-opacity=".02"/><stop offset="1" stop-color="#fff" stop-opacity=".15"/></linearGradient>
+        <linearGradient id="g-dawn" x1="0" x2="1"><stop offset="0" stop-color="#5b4bd6"/><stop offset=".5" stop-color="#e86f8f"/><stop offset="1" stop-color="#ffb36b"/></linearGradient>
+        <filter id="f-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <pattern id="p-mesh" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 0L6 6M6 0L0 6" stroke="#d8c6ae" stroke-opacity=".13" stroke-width=".6" fill="none"/></pattern>
+        <pattern id="p-fab" width="5" height="5" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="#2a2522"/><circle cx="2.5" cy="2.5" r="1.1" fill="#4b413a"/></pattern>
+      </defs>
+      <ellipse class="haloE" cx="320" cy="300" rx="315" ry="240" fill="url(#g-halo)"/>
+      <ellipse cx="320" cy="478" rx="235" ry="15" fill="#000" opacity=".5"/>
+      <rect x="168" y="452" width="46" height="18" rx="5" fill="url(#g-brass)"/>
+      <rect x="426" y="452" width="46" height="18" rx="5" fill="url(#g-brass)"/>
+      <!-- brass dial -->
+      <rect x="176" y="134" width="48" height="20" rx="7" fill="url(#g-brass)"/>
+      <path d="M184 136v6M192 136v6M200 136v6M208 136v6M216 136v6" stroke="#5b421a" stroke-width="1.4"/>
+      <!-- lever -->
+      <g class="lever">
+        <rect x="436" y="82" width="8" height="62" rx="4" fill="url(#g-brass)"/>
+        <circle cx="440" cy="80" r="14" fill="url(#g-brass)"/>
+        <circle cx="436" cy="75" r="4" fill="#fff6d8" opacity=".6"/>
+      </g>
+      <rect x="410" y="134" width="60" height="20" rx="7" fill="url(#g-brass)"/>
+      <!-- body -->
+      <rect x="100" y="148" width="440" height="312" rx="72" fill="url(#g-wal)"/>
+      <g fill="none" stroke="#24130a" stroke-opacity=".28" stroke-width="2">
+        <path d="M112 210C210 186 300 236 528 196"/><path d="M106 268C220 244 330 292 534 252"/>
+        <path d="M110 330C230 304 320 356 532 318"/><path d="M118 392C220 370 340 412 526 380"/>
+        <path d="M130 432C250 414 330 446 512 424" stroke-opacity=".18"/>
+      </g>
+      <rect x="112" y="154" width="416" height="42" rx="32" fill="#fff" opacity=".06"/>
+      <!-- glass front -->
+      <rect x="140" y="188" width="360" height="164" rx="26" fill="url(#g-glass)" stroke="#1a120c" stroke-width="5"/>
+      <g class="tubes" font-family="IBM Plex Mono, ui-monospace, monospace" font-weight="300" font-size="92" text-anchor="middle">
+        <g><rect x="162" y="206" width="56" height="120" rx="26" fill="#000" opacity=".35"/><text class="dg" x="190" y="298" fill="#ffa040" filter="url(#f-glow)">0</text><rect x="162" y="206" width="56" height="120" rx="26" fill="url(#p-mesh)"/><rect x="162" y="206" width="56" height="120" rx="26" fill="url(#g-tube)" stroke="#fff" stroke-opacity=".16"/></g>
+        <g><rect x="232" y="206" width="56" height="120" rx="26" fill="#000" opacity=".35"/><text class="dg" x="260" y="298" fill="#ffa040" filter="url(#f-glow)">7</text><rect x="232" y="206" width="56" height="120" rx="26" fill="url(#p-mesh)"/><rect x="232" y="206" width="56" height="120" rx="26" fill="url(#g-tube)" stroke="#fff" stroke-opacity=".16"/></g>
+        <g><rect x="352" y="206" width="56" height="120" rx="26" fill="#000" opacity=".35"/><text class="dg" x="380" y="298" fill="#ffa040" filter="url(#f-glow)">0</text><rect x="352" y="206" width="56" height="120" rx="26" fill="url(#p-mesh)"/><rect x="352" y="206" width="56" height="120" rx="26" fill="url(#g-tube)" stroke="#fff" stroke-opacity=".16"/></g>
+        <g><rect x="422" y="206" width="56" height="120" rx="26" fill="#000" opacity=".35"/><text class="dg" x="450" y="298" fill="#ffa040" filter="url(#f-glow)">0</text><rect x="422" y="206" width="56" height="120" rx="26" fill="url(#p-mesh)"/><rect x="422" y="206" width="56" height="120" rx="26" fill="url(#g-tube)" stroke="#fff" stroke-opacity=".16"/></g>
+      </g>
+      <circle class="colon" cx="320" cy="248" r="5" fill="#ffa040" filter="url(#f-glow)"/>
+      <circle class="colon" cx="320" cy="288" r="5" fill="#ffa040" filter="url(#f-glow)"/>
+      <circle class="recdot" cx="482" cy="206" r="4.5" fill="#ff5a5a"/>
+      <rect class="dawnbar" x="190" y="336" width="260" height="4" rx="2" fill="url(#g-dawn)"/>
+      <!-- grille -->
+      <rect x="140" y="368" width="360" height="62" rx="20" fill="url(#p-fab)"/>
+      <text x="320" y="449" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="6" fill="#e9c98f" opacity=".75">ONEIRO</text>
+    </svg>
+    <p class="caption">הדמיה: גוף עץ אגוז, נורות ספרות בסגנון ניקסי, רשת רמקול מבד, ידית הקלטה מפליז. 18×13×11 ס״מ.</p>
+  </div>
+</header>
+
+<!-- SIMULATOR -->
+<section id="sim">
+  <div class="sec-head">
+    <span class="eyebrow">סימולציה חיה</span>
+    <h2>בוקר אחד עם ONEIRO</h2>
+    <p class="muted">לחצו על "להעיר אותי". השעון מדמה 20 דקות זריחה בכמה שניות ומנגן מנגינת קופסת נגינה בעוצמה עולה (כדאי להדליק סאונד). אחר כך מספרים את החלום: מחזיקים את ידית הפליז ומדברים, מקלידים, או בוחרים חלום לדוגמה.</p>
+  </div>
+  <div class="sim">
+    <div class="bedside" id="bedside">
+      <div id="simClock"></div>
+      <p class="status" id="status">06:57 · לילה. השעון ער בשקט, האור כבוי והמיקרופון לא מקליט.</p>
+      <div class="steps" aria-hidden="true"><span id="s1" class="on">לילה</span><span id="s2">זריחה</span><span id="s3">מנגינה</span><span id="s4">ספרו את החלום</span><span id="s5">פירוש</span></div>
+      <div class="ctrls">
+        <div class="row">
+          <button class="btn primary" id="wakeBtn" type="button">להעיר אותי</button>
+          <button class="btn" id="muteBtn" type="button" hidden>להשתיק מנגינה</button>
+          <button class="btn" id="resetBtn" type="button" hidden>לילה חדש</button>
+        </div>
+        <div class="capture" id="capture" hidden>
+          <div class="ctrls">
+            <button class="btn lever" id="leverBtn" type="button" hidden>החזיקו את הידית ודברו</button>
+            <p class="partial" id="partial" aria-live="polite"></p>
+            <label for="dreamText" class="small muted">מה חלמתם? (אפשר להקליד)</label>
+            <textarea id="dreamText" placeholder="חלמתי ש..."></textarea>
+            <div class="samples" id="samples"></div>
+            <button class="btn primary" id="interpBtn" type="button">לשמור ולפרש</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone" aria-label="מסך האפליקציה">
+      <div class="screen" id="screen">
+        <div class="notch"></div>
+        <div class="appbar"><span class="logo">ONEIRO</span><span class="tag-example" id="pTag">דוגמה</span></div>
+        <div class="small muted num" id="pDate">יום רביעי · 25.11 · 07:02 · הוקלט 0:48 דק׳</div>
+        <div id="pBody"></div>
+        <p class="source" id="pSource">פירוש לדוגמה שנכתב מראש</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- JOURNEY -->
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">איך זה עובד</span>
+    <h2>מהלילה עד התובנה</h2>
+  </div>
+  <ol class="journey">
+    <li><span class="t">06:40</span><h3>זריחה מלאכותית</h3><p class="muted">פס האור מתחת לספרות מתחיל בסגול ועובר לכתום חם במשך 20 דקות. הגוף מתחיל להתעורר עוד לפני הצליל.</p></li>
+    <li><span class="t">07:00</span><h3>מנגינה שקטה</h3><p class="muted">קופסת נגינה בעוצמה עולה, בלי ביפים. מעבר עדין עוזר לשמור את החלום בזיכרון: רוב החלומות נשכחים תוך דקות מהיקיצה.</p></li>
+    <li><span class="t">07:01</span><h3>מושכים את הידית ומספרים</h3><p class="muted">"מה חלמת?" ואתם מדברים, בעיניים חצי עצומות. הטלפון נשאר בצד, כי מסך מוחק חלומות מהר.</p></li>
+    <li><span class="t">07:02</span><h3>פירוש ותובנה</h3><p class="muted">באפליקציה מחכים תמלול, כותרת, סמלים, רגשות, פירוש ושאלה אחת לקחת ליום. פעם בחודש מגיע דוח מגמות.</p></li>
+  </ol>
+</section>
+
+<!-- MONTHLY REPORT -->
+<section>
+  <div class="sec-head">
+    <span class="eyebrow">דוח חודשי · דוגמה</span>
+    <h2>החודש שלכם בחלומות</h2>
+    <p class="muted">אחרי חודש של הקלטות, האפליקציה מוצאת מה חוזר. זה הערך שהכי קשה להשיג לבד עם מחברת ליד המיטה.</p>
+  </div>
+  <div class="report">
+    <div style="display:grid;gap:18px;min-width:0">
+      <div><h3>נובמבר 2026</h3><p class="muted small"><span class="num">23</span> חלומות נשמרו מתוך <span class="num">30</span> לילות · ממוצע <span class="num">0:52</span> דק׳ הקלטה</p></div>
+      <div class="bars">
+        <div class="bar"><span>מים</span><div class="tr"><div class="fill" style="width:100%"></div></div><span class="num">7</span></div>
+        <div class="bar"><span>בית ילדות</span><div class="tr"><div class="fill" style="width:86%"></div></div><span class="num">6</span></div>
+        <div class="bar"><span>תעופה</span><div class="tr"><div class="fill" style="width:57%"></div></div><span class="num">4</span></div>
+        <div class="bar"><span>חברים מהתיכון</span><div class="tr"><div class="fill" style="width:57%"></div></div><span class="num">4</span></div>
+        <div class="bar"><span>איחור</span><div class="tr"><div class="fill" style="width:29%"></div></div><span class="num">2</span></div>
+      </div>
+    </div>
+    <div style="display:grid;gap:14px;min-width:0">
+      <svg class="spark" viewBox="0 0 400 130" role="img" aria-label="גרף מצב רוח בחלומות לאורך החודש">
+        <line x1="10" y1="20" x2="390" y2="20" stroke="rgba(236,230,245,.08)"/>
+        <line x1="10" y1="65" x2="390" y2="65" stroke="rgba(236,230,245,.08)"/>
+        <line x1="10" y1="110" x2="390" y2="110" stroke="rgba(236,230,245,.08)"/>
+        <path d="M10 70 L60 58 L110 80 L160 92 L210 86 L260 60 L310 44 L360 36 L390 30 L390 110 L10 110Z" fill="rgba(139,123,243,.14)"/>
+        <path d="M10 70 L60 58 L110 80 L160 92 L210 86 L260 60 L310 44 L360 36 L390 30" fill="none" stroke="#8b7bf3" stroke-width="2.5"/>
+        <circle cx="390" cy="30" r="5" fill="#ffa640"/>
+        <text x="390" y="126" text-anchor="end">30.11</text><text x="10" y="126" text-anchor="start">1.11</text>
+        <text x="200" y="14" text-anchor="middle">טון רגשי בחלומות: שלילי ← חיובי</text>
+      </svg>
+      <div class="card insight"><span class="k">התובנה של החודש</span>המים הופיעו 7 פעמים, ו־5 מהן בשבוע שבו ישנתם פחות משש שעות. בשבוע השלישי חלומות הלחץ ירדו והטון השתפר. זה בדיוק השבוע שבו הפסקתם מסכים אחרי 23:00.</div>
+    </div>
+  </div>
+</section>
+
+<!-- COSTS -->
+<section id="cost">
+  <div class="sec-head">
+    <span class="eyebrow">כמה זה עולה מא׳ עד ת׳</span>
+    <h2>תקציב הפרויקט</h2>
+    <p class="muted">הערכה למוצר מוכן למכירה, כולל ייצור ראשון של 2,000 יחידות. מחירים בשקלים, לפי שוק 2026, דולר ≈ ₪3.6. הטווח האמיתי תלוי בצוות ובכמה עובדים בתוך הבית מול קבלני משנה.</p>
+  </div>
+  <div class="big-figs">
+    <div class="fig"><span class="v">₪2.5M</span><span class="l">פרויקט מלא עד השקה (12–15 חודשים)</span></div>
+    <div class="fig"><span class="v">₪400K</span><span class="l">גרסת MVP צנועה: 100 יחידות בטא</span></div>
+    <div class="fig"><span class="v">₪390</span><span class="l">עלות ייצור ליחידה, כולל שילוח ומכס</span></div>
+    <div class="fig"><span class="v">₪849</span><span class="l">מחיר מכירה לצרכן (≈ $229)</span></div>
+  </div>
+  <div class="tables">
+    <div class="tbl">
+      <table>
+        <caption>פיתוח והשקה</caption>
+        <thead><tr><th>סעיף</th><th class="n">₪ אלפים</th></tr></thead>
+        <tbody>
+          <tr><td>עיצוב תעשייתי ואבות טיפוס</td><td class="n">120</td></tr>
+          <tr><td>הנדסת אלקטרוניקה (מעגל, אודיו, תאורה)</td><td class="n">180</td></tr>
+          <tr><td>קושחה (Firmware) לשעון</td><td class="n">120</td></tr>
+          <tr><td>אפליקציה iOS + Android</td><td class="n">300</td></tr>
+          <tr><td>שרת, תמלול, מנוע פירוש AI, אבטחה ופרטיות</td><td class="n">150</td></tr>
+          <tr><td>תקינה: CE, FCC, בטיחות, משרד התקשורת</td><td class="n">90</td></tr>
+          <tr><td>כלי ייצור וסבבי פיילוט EVT/DVT/PVT</td><td class="n">150</td></tr>
+          <tr><td>ייצור ראשון: 2,000 × ₪390</td><td class="n">780</td></tr>
+          <tr><td>שיווק השקה וקמפיין מימון המונים</td><td class="n">250</td></tr>
+          <tr><td>משפטי, פטנט, הקמת חברה</td><td class="n">60</td></tr>
+          <tr><td>רזרבה לבלת״מ (15%)</td><td class="n">300</td></tr>
+        </tbody>
+        <tfoot><tr><td>סה״כ</td><td class="n">≈ 2,500</td></tr></tfoot>
+      </table>
+      <p class="small muted" style="margin-top:10px">את 780 אלף המלאי אפשר לממן מהזמנות מוקדמות בקיקסטארטר, כך שההון שצריך לגייס בפועל הוא בערך ₪1.7M.</p>
+    </div>
+    <div class="tbl">
+      <table>
+        <caption>עלות חומרים ליחידה (BOM, ב־3,000 יח׳)</caption>
+        <thead><tr><th>רכיב</th><th class="n">₪</th></tr></thead>
+        <tbody>
+          <tr><td>מעבד ESP32-S3 (Wi-Fi, BT), מעגל מודפס והרכבה</td><td class="n">45</td></tr>
+          <tr><td>4 תצוגות ספרות בסגנון ניקסי (LED פילמנט, בלי מתח גבוה)</td><td class="n">70</td></tr>
+          <tr><td>גוף עץ אגוז בעיבוד CNC וגימור שמן</td><td class="n">60</td></tr>
+          <tr><td>ידית, חוגה ורגליים מפליז</td><td class="n">25</td></tr>
+          <tr><td>רמקול 3W, מגבר, רשת בד</td><td class="n">24</td></tr>
+          <tr><td>2 מיקרופוני MEMS ומעבד אודיו</td><td class="n">15</td></tr>
+          <tr><td>פס לד זריחה RGBW ומפזר אור</td><td class="n">20</td></tr>
+          <tr><td>חזית זכוכית</td><td class="n">9</td></tr>
+          <tr><td>USB-C, גיבוי שעון, חיישני אור וטמפרטורה</td><td class="n">23</td></tr>
+          <tr><td>אריזה ומדריך</td><td class="n">22</td></tr>
+          <tr><td>הרכבה סופית, בדיקות QA, שילוח, מכס</td><td class="n">77</td></tr>
+        </tbody>
+        <tfoot><tr><td>עלות ליחידה מונחת במחסן</td><td class="n">≈ 390</td></tr></tfoot>
+      </table>
+      <p class="small muted" style="margin-top:10px">נורות ניקסי אמיתיות עולות ₪50–80 לנורה, צריכות 170V ונשרפות עם השנים. התצוגה המדומה נותנת את אותו מראה בשליש מהמחיר.</p>
+    </div>
+  </div>
+</section>
+
+<!-- BUSINESS -->
+<section id="biz">
+  <div class="sec-head">
+    <span class="eyebrow">מודל עסקי</span>
+    <h2>מכשיר שמרוויח, ומנוי שמחזיק את העסק</h2>
+    <p class="muted">השעון מכסה את עצמו ומשאיר רווח צנוע. הרווח האמיתי מגיע מהמנוי: עלות ה־AI לכל משתמש היא בערך ₪4–5 בחודש, ושיעור הרווח הגולמי על המנוי כ־75%.</p>
+  </div>
+  <div class="tiers">
+    <div class="tier">
+      <h3>השעון</h3>
+      <span class="price">₪849</span>
+      <ul><li>כל חומרת השעון</li><li>תמלול כל החלומות ליומן באפליקציה</li><li>פירוש אחד ודוח חודשי, בחינם לתמיד</li></ul>
+    </div>
+    <div class="tier hl">
+      <h3>ONEIRO+</h3>
+      <span class="price">₪24.90<span class="small muted"> / חודש</span></span>
+      <span class="small muted">או ₪199 לשנה · 3 חודשים חינם עם השעון</span>
+      <ul><li>פירוש ותובנה כל בוקר</li><li>מפת סמלים וחלומות חוזרים</li><li>קשר בין שינה, מצב רוח וחלומות</li><li>תמונת אמנות מהחלום, פעם בשבוע</li></ul>
+    </div>
+    <div class="tier">
+      <h3>אפליקציה בלבד</h3>
+      <span class="price">₪14.90<span class="small muted"> / חודש</span></span>
+      <ul><li>מקליטים מהטלפון</li><li>משפך כניסה זול: מי שמתאהב, קונה שעון</li><li>מטפלים ומאמנים: לוח עבודה עם הסכמת המטופל, ₪99 לחודש</li></ul>
+    </div>
+  </div>
+
+  <h3 style="margin-top:40px">מה נשאר מכל שעון שנמכר</h3>
+  <div class="waterfall" id="waterfall"></div>
+  <p class="small muted" style="margin-top:10px">בתוספת מנוי: 35% מהקונים משלמים ₪199 לשנה. אחרי עמלות חנות ו־AI נשארים בערך ₪115 לשנה מכל מנוי, כלומר עוד כ־₪85 בממוצע לכל שעון לאורך חיי הלקוח.</p>
+
+  <div class="big-figs" style="margin-top:32px">
+    <div class="fig"><span class="v">~₪235</span><span class="l">רווח תרומה לכל לקוח (שעון + מנוי)</span></div>
+    <div class="fig"><span class="v">~7,500</span><span class="l">שעונים עד החזר ההשקעה בפיתוח</span></div>
+    <div class="fig"><span class="v">₪3.1M</span><span class="l">הכנסות בשנה 1 (4,000 שעונים)</span></div>
+    <div class="fig"><span class="v">₪21M</span><span class="l">הכנסות בשנה 3 (25,000 שעונים, 14K מנויים)</span></div>
+  </div>
+
+  <div class="streams">
+    <div class="stream"><h3>שלב 1: קיקסטארטר</h3><p class="muted">יעד $250K במחיר מוקדם של $179. זה מממן את המלאי ובודק אם יש ביקוש לפני שמייצרים. מוצר שנראה טוב בווידאו מתאים בדיוק לפלטפורמה הזו.</p></div>
+    <div class="stream"><h3>שלב 2: מכירה ישירה</h3><p class="muted">אתר עצמאי, משפיעני שינה ובריאות, קהילות של חלימה צלולה ורדיט. מתנות לחגים וחתונות, כי זה חפץ יפה עם סיפור.</p></div>
+    <div class="stream"><h3>שלב 3: הרחבה</h3><p class="muted">חנויות עיצוב ומוזיאונים, מלונות בוטיק ("חדר חלומות"), שיתופי פעולה עם מטפלים יונגיאנים, ומהדורות עץ מוגבלות במחיר גבוה.</p></div>
+  </div>
+</section>
+
+<!-- UPGRADES -->
+<section id="up">
+  <div class="sec-head">
+    <span class="eyebrow">שדרוגים</span>
+    <h2>מה הייתי מוסיף</h2>
+    <p class="muted"><span class="prio p1">גרסה 1</span> שווה להכניס כבר בהשקה. <span class="prio p2">גרסה 2</span> לדור הבא.</p>
+  </div>
+  <div class="up">
+    <div>
+      <h3 style="margin-bottom:16px">חומרה</h3>
+      <ul>
+        <li><b>חיישן רדאר לשלבי שינה <span class="prio p1">גרסה 1</span></b><span>רדאר 60GHz קטן מזהה נשימה ותנועה בלי שעון יד. השעון מעיר בסוף שלב REM, בתוך חלון של 30 דקות, ושם החלומות הכי זכורים. זה השדרוג הכי חשוב (+₪35 ליחידה).</span></li>
+        <li><b>ידית פליז עם תחושה מכנית <span class="prio p1">גרסה 1</span></b><span>"קליק" אמיתי והתנגדות קלה. המשיכה עצמה הופכת לטקס, וגם מבטיחה שהמיקרופון מקליט רק כשמושכים.</span></li>
+        <li><b>מצב לילה <span class="prio p1">גרסה 1</span></b><span>מתעוררים ב־3 בלילה מחלום? לוחשים לשעון באור אדום חלש שלא פוגע בשינה.</span></li>
+        <li><b>תמלול על המכשיר עצמו <span class="prio p2">גרסה 2</span></b><span>שבב חזק יותר שמריץ תמלול מקומי. הקול לא עוזב את חדר השינה, רק הטקסט. זה טיעון פרטיות חזק.</span></li>
+        <li><b>מחסנית ריח <span class="prio p2">גרסה 2</span></b><span>ריח עדין (לבנדר, הדרים) כחלק מההתעוררות או כרמז במהלך הלילה.</span></li>
+        <li><b>מצב זוגי <span class="prio p2">גרסה 2</span></b><span>זיהוי דובר: שני אנשים במיטה, שני יומני חלומות נפרדים.</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="margin-bottom:16px">תוכנה</h3>
+      <ul>
+        <li><b>שאלות המשך בקול <span class="prio p1">גרסה 1</span></b><span>אחרי שסיימתם, השעון שואל שאלה אחת: "איך הרגשת שם?" או "מי עוד היה?". זה מוציא עוד פרטים מהזיכרון.</span></li>
+        <li><b>מפת סמלים אישית <span class="prio p1">גרסה 1</span></b><span>לא מילון חלומות כללי. המשמעות נבנית ממה ש"מים" או "סבתא" אומרים אצלכם, לאורך חודשים.</span></li>
+        <li><b>קשר לחיים <span class="prio p1">גרסה 1</span></b><span>שאלה קצרה בערב (מצב רוח, קפה, מסכים) מול החלומות והשינה. מכאן מגיעות התובנות הכי מעניינות.</span></li>
+        <li><b>תמונה מהחלום <span class="prio p2">גרסה 2</span></b><span>יצירת תמונה מהחלום הכי חזק בשבוע. זה גם תוכן ויראלי שמשתמשים משתפים.</span></li>
+        <li><b>אימון חלימה צלולה <span class="prio p2">גרסה 2</span></b><span>בדיקות מציאות במהלך היום וצלילים שקטים בזמן REM, שיטה שנחקרה במעבדות שינה.</span></li>
+        <li><b>ספר חלומות שנתי <span class="prio p2">גרסה 2</span></b><span>ספר מודפס עם החלומות, התמונות והתובנות של השנה. מוצר נוסף ברווח גבוה, ומתנה מצוינת.</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="honest">
+    <h3>מה צריך לקחת בחשבון</h3>
+    <ul>
+      <li>לפירוש חלומות אין בסיס מדעי מוצק. הייתי ממתג את זה כ"תובנה ורפלקציה" ולא כנבואה או אבחון, וכותב את זה במפורש באפליקציה.</li>
+      <li>מיקרופון בחדר שינה הוא נושא רגיש. צריך מתג פיזי, נורית הקלטה, הצפנה מקצה לקצה ומחיקה בלחיצה. זה חייב להיות חלק מהשיווק.</li>
+      <li>חומרה היא עסק קשה: מלאי, החזרות, אחריות. לכן כדאי להתחיל באפליקציה בלבד ובקיקסטארטר ולוודא ביקוש לפני שמייצרים 2,000 יחידות.</li>
+      <li>מתחרים קרובים: Hatch Restore ו־Loftie (שעונים עם אור וצליל, בערך $150–$170), ואפליקציות יומן חלומות. אף אחד מהם לא משלב הקלטה ופירוש בתוך שעון.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>ONEIRO היא הדמיה של רעיון מוצר. המספרים הם הערכות לתכנון ולא הצעת מחיר. הפירושים באפליקציה נועדו לרפלקציה ואינם ייעוץ פסיכולוגי.</footer>
+</div>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  // ---------- sample dreams ----------
+  const SAMPLES = [
+    {label:"הבית של סבתא", text:"חלמתי שהייתי בבית של סבתא שלי, אבל היו בו חדרים שלא הכרתי. אחד מהם היה מלא במים עד הברכיים. לא פחדתי, דווקא היה נעים ושקט.",
+     r:{title:"החדר הנסתר בבית של סבתא",symbols:["בית ילדות","חדר לא מוכר","מים עד הברכיים"],emotions:["סקרנות","ביטחון","נוסטלגיה"],
+      interpretation:"בית בחלום מייצג לעיתים קרובות את העצמי, ובית ילדות קשור לשורשים ולתחושת מוגנות. בגישה היונגיאנית, חדרים חדשים בבית מוכר הם חלקים באישיות שעוד לא הכרתם. מים מסמלים רגש, וכאן הם מגיעים עד הברכיים ולא מציפים: נוגעים ברגש עמוק, אבל עומדים יציב.",
+      insight:"ייתכן שמשהו חדש נפתח בכם, תחום עניין או רגש, ויש לכם מספיק ביטחון לחקור אותו.",question:"איזה ״חדר״ בחיים שלכם עוד לא פתחתם?"}},
+    {label:"איחור לטיסה", text:"חלמתי שאיחרתי לטיסה. רצתי בשדה התעופה, והדרכון שלי כל הזמן שינה צבע, אז לא נתנו לי לעבור בבידוק.",
+     r:{title:"הדרכון שלא נשאר באותו צבע",symbols:["איחור","שדה תעופה","דרכון משתנה","בידוק"],emotions:["לחץ","בלבול","דחיפות"],
+      interpretation:"חלומות איחור הם מהנפוצים ביותר, ובדרך כלל משקפים עומס ותחושה שהזמן בורח. שדה תעופה הוא מקום של מעבר בין שלבים. הדרכון הוא תעודת הזהות, וכשהוא משנה צבע זה יכול לרמוז על התלבטות לגבי מי אתם בשלב הבא, או על חשש שמשהו בכם לא ״יעבור ביקורת״.",
+      insight:"כדאי לבדוק אם יש החלטה או מעבר שאתם דוחים, ומה ממנו באמת בשליטתכם השבוע.",question:"לאן אתם ממהרים, ומי קבע את שעת ההמראה?"}},
+    {label:"עפתי מעל תל אביב", text:"חלמתי שעפתי מעל תל אביב בלילה, מעל הים והאורות. פתאום הבנתי שזה חלום, וניסיתי לעוף יותר גבוה.",
+     r:{title:"טיסה לילית מעל העיר",symbols:["תעופה","עיר בלילה","ים","מודעות בתוך החלום"],emotions:["חופש","התרוממות","פליאה"],
+      interpretation:"תעופה בחלום קשורה לתחושת חופש ושליטה, ולפעמים לרצון להתרחק מהשגרה ולראות אותה מלמעלה. הרגע שבו הבנתם שאתם חולמים נקרא חלום צלול. זה מצב מוכר במחקר השינה, ואפשר לתרגל אותו.",
+      insight:"יש בכם עכשיו יכולת לראות את התמונה הרחבה. זה זמן טוב לתכנן ולא רק לבצע.",question:"אם הייתם שולטים בחלום הבא, לאן הייתם טסים?"}}
+  ];
+  const KEYS = [
+    [/מים|ים|בריכה|גשם|נהר/,"מים","רגש וזרימה"],[/בית|דירה|חדר/,"בית","העצמי והביטחון"],[/עפ|טס|מעופף|תעופה/,"תעופה","חופש ונקודת מבט"],
+    [/נפל|נופל|נפילה/,"נפילה","אובדן שליטה"],[/רדפ|רודפ|בורח|ברחתי/,"מרדף","משהו שנמנעים ממנו"],[/מבחן|בחינה|בגרות/,"מבחן","הערכה עצמית"],
+    [/שיניים|שן/,"שיניים","דימוי עצמי ושינוי"],[/איחר|מאחר|פספס/,"איחור","לחץ זמן"],[/כלב|חתול|נחש|חיה/,"בעל חיים","אינסטינקט"],
+    [/אמא|אבא|סבתא|סבא|אח|אחות/,"משפחה","שורשים ויחסים"],[/עבודה|בוס|משרד/,"עבודה","אחריות וזהות"],[/מוות|מת|הלוויה/,"מוות","סוף של שלב ופתיחה של חדש"]
+  ];
+  function fallback(text){
+    const hits = KEYS.filter(k=>k[0].test(text));
+    const sy = hits.length? hits.slice(0,4) : [[null,"סצנה יומיומית","עיבוד של היום הקודם"]];
+    return {title: "החלום של הבוקר", symbols: sy.map(h=>h[1]), emotions:["לא זוהה"],
+      interpretation: "זיהוי סמלים בסיסי: " + sy.map(h=>h[1]+" ("+h[2]+")").join(", ") + ". בעמוד הזה הפירוש המלא של ה־AI זמין רק כשפותחים אותו ב־claude.ai.",
+      insight:"שימו לב איזה רגש נשאר אתכם מהחלום. הוא בדרך כלל חשוב יותר מהעלילה.", question:"מה הרגשתם ברגע הכי חזק בחלום?"};
+  }
+
+  // ---------- render phone ----------
+  function el(tag, cls, text){const e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e;}
+  function renderResult(dream, r, opts){
+    const b = $("#pBody"); b.replaceChildren();
+    const wrap = el("div"); wrap.style.cssText="display:grid;gap:12px";
+    wrap.append(el("div","ptitle",r.title||"החלום של הבוקר"));
+    wrap.append(el("p","pdream",dream));
+    const s = el("div","pills"); (r.symbols||[]).slice(0,5).forEach(x=>s.append(el("span",null,x))); wrap.append(s);
+    const e = el("div","pills emo"); (r.emotions||[]).slice(0,4).forEach(x=>e.append(el("span",null,x))); wrap.append(e);
+    const c1 = el("div","card"); c1.append(el("span","k","פירוש"), el("span",null,r.interpretation||"")); wrap.append(c1);
+    const c2 = el("div","card insight"); c2.append(el("span","k","תובנה ליום"), el("span",null,r.insight||"")); wrap.append(c2);
+    const c3 = el("div","card"); c3.append(el("span","k","שאלה לקחת איתכם"), el("span",null,r.question||"")); wrap.append(c3);
+    b.append(wrap);
+    $("#pTag").textContent = opts.tag; $("#pSource").textContent = opts.source;
+  }
+  function renderLoading(){const b=$("#pBody"); b.replaceChildren(); const l=el("div","loading"); l.append(el("i"),el("i"),el("i")); b.append(l, el("p","source","מתמלל ומפרש...")); }
+
+  // ---------- clock in simulator ----------
+  const tpl = $("#clockTpl");
+  const simSvg = tpl.cloneNode(true); simSvg.removeAttribute("id"); simSvg.setAttribute("aria-label","השעון בסימולציה");
+  $("#simClock").append(simSvg);
+  simSvg.style.setProperty("--dawn",".06");
+  function setTime(h,m){const d=(String(h).padStart(2,"0")+String(m).padStart(2,"0")).split(""); simSvg.querySelectorAll(".dg").forEach((t,i)=>t.textContent=d[i]);}
+  setTime(6,57);
+  simSvg.querySelectorAll(".dg,.colon").forEach(n=>n.setAttribute("opacity",".35"));
+
+  // ---------- music box ----------
+  let ctx=null, master=null, loopTimer=null;
+  const NOTES=[523.25,659.25,783.99,880,1046.5,783.99,659.25,587.33, 523.25,587.33,659.25,783.99,659.25,523.25,440,392];
+  function chime(f,t,v){const o=ctx.createOscillator(),o2=ctx.createOscillator(),g=ctx.createGain();
+    o.type="sine";o.frequency.value=f;o2.type="sine";o2.frequency.value=f*2.01;
+    const g2=ctx.createGain();g2.gain.value=.18;o2.connect(g2);g2.connect(g);o.connect(g);g.connect(master);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.012);g.gain.exponentialRampToValueAtTime(.0005,t+2.6);
+    o.start(t);o2.start(t);o.stop(t+2.7);o2.stop(t+2.7);}
+  function startMusic(){
+    try{ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();}catch(e){return;}
+    ctx.resume&&ctx.resume();
+    master=ctx.createGain(); master.gain.setValueAtTime(.02,ctx.currentTime); master.gain.linearRampToValueAtTime(.32,ctx.currentTime+14); master.connect(ctx.destination);
+    let i=0; const step=.42;
+    const sched=()=>{const t0=ctx.currentTime+.05; NOTES.forEach((f,k)=>chime(f,t0+k*step,.5)); i++;};
+    sched(); loopTimer=setInterval(sched, NOTES.length*step*1000);
+  }
+  function stopMusic(){ if(loopTimer){clearInterval(loopTimer);loopTimer=null;} if(master&&ctx){const m=master; m.gain.cancelScheduledValues(ctx.currentTime); m.gain.setValueAtTime(m.gain.value,ctx.currentTime); m.gain.linearRampToValueAtTime(0,ctx.currentTime+1.2); setTimeout(()=>{try{m.disconnect()}catch(e){}},1400);} $("#muteBtn").hidden=true; }
+
+  // ---------- flow ----------
+  const steps=["#s1","#s2","#s3","#s4","#s5"];
+  function step(n){steps.forEach((s,i)=>$(s).classList.toggle("on",i===n));}
+  const status = t => { $("#status").innerHTML = t; };
+  let timers=[];
+  $("#wakeBtn").addEventListener("click",()=>{
+    $("#wakeBtn").hidden=true;
+    step(1); status("<b>06:40</b> · הזריחה מתחילה. פס האור עובר מסגול לכתום (20 דקות מקוצרות לשניות).");
+    $("#bedside").classList.add("morning");
+    simSvg.querySelectorAll(".dg,.colon").forEach(n=>n.setAttribute("opacity","1"));
+    requestAnimationFrame(()=>simSvg.style.setProperty("--dawn","1"));
+    let m=57; timers.push(setInterval(()=>{ if(m<60){m++; setTime(m===60?7:6, m===60?0:m);} },1100));
+    startMusic(); $("#muteBtn").hidden=false;
+    timers.push(setTimeout(()=>{step(2); status("<b>07:00</b> · מנגינת קופסת נגינה, בעוצמה שעולה לאט. בלי ביפים.");},3600));
+    timers.push(setTimeout(()=>{step(3); status("<b>״בוקר טוב. מה חלמת?״</b> · מושכים את הידית ומספרים, לפני שהחלום נעלם.");
+      $("#capture").hidden=false; $("#resetBtn").hidden=false;},7000));
+  });
+  $("#muteBtn").addEventListener("click",stopMusic);
+  $("#resetBtn").addEventListener("click",()=>{
+    timers.forEach(t=>{clearInterval(t);clearTimeout(t)}); timers=[]; stopMusic();
+    $("#capture").hidden=true; $("#resetBtn").hidden=true; $("#wakeBtn").hidden=false; $("#bedside").classList.remove("morning");
+    simSvg.style.setProperty("--dawn",".06"); setTime(6,57); simSvg.querySelectorAll(".dg,.colon").forEach(n=>n.setAttribute("opacity",".35"));
+    step(0); status("06:57 · לילה. השעון ער בשקט, האור כבוי והמיקרופון לא מקליט.");
+  });
+
+  // samples chips
+  SAMPLES.forEach(s=>{const b=el("button",null,"דוגמה: "+s.label); b.type="button"; b.addEventListener("click",()=>{$("#dreamText").value=s.text;}); $("#samples").append(b);});
+
+  // ---------- capabilities: dictation + sample ----------
+  let dict=null, sampleApi=null;
+  const use = (window.claude && window.claude.use) ? n=>window.claude.use(n).catch(()=>null) : ()=>Promise.resolve(null);
+  use("sample").then(s=>{sampleApi=s;});
+  use("dictation").then(d=>{
+    if(!d) return; dict=d; const btn=$("#leverBtn"); btn.hidden=false;
+    d.onPartial(({text})=>{$("#partial").textContent=text;});
+    d.onFinal(({text})=>{const ta=$("#dreamText"); ta.value=(ta.value?ta.value.trim()+" ":"")+text; $("#partial").textContent="";});
+    d.onState(({state})=>{const on=state==="listening"; btn.classList.toggle("active",on); simSvg.classList.toggle("rec",on); btn.textContent=on?"מקליט... שחררו לסיום":"החזיקו את הידית ודברו";});
+    let holding=false;
+    const down=e=>{e.preventDefault(); if(holding) return; holding=true; stopMusic(); d.start().catch(err=>{holding=false; if(err&&err.code==="not_granted"){btn.hidden=true;}});};
+    const up=()=>{ if(!holding) return; holding=false; d.stop().catch(()=>{}); };
+    btn.addEventListener("pointerdown",down); btn.addEventListener("pointerup",up); btn.addEventListener("pointerleave",up); btn.addEventListener("pointercancel",up);
+    btn.addEventListener("keydown",e=>{if((e.key===" "||e.key==="Enter")&&!e.repeat) down(e);}); btn.addEventListener("keyup",e=>{if(e.key===" "||e.key==="Enter") up();});
+  });
+
+  function parseJSON(t){const a=t.indexOf("{"), b=t.lastIndexOf("}"); if(a<0||b<a) throw new Error("no json"); return JSON.parse(t.slice(a,b+1));}
+  async function interpret(){
+    const text=$("#dreamText").value.trim(); if(!text){ $("#dreamText").focus(); return; }
+    stopMusic(); step(4); status("<b>נשמר.</b> החלום עבר לאפליקציה. פירוש ותובנה מוכנים בטלפון.");
+    renderLoading();
+    const now=new Date(); $("#pDate").textContent = "היום · " + now.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"}) + " · " + text.split(/\s+/).length + " מילים";
+    const canned = SAMPLES.find(s=>s.text===text);
+    if(canned && !sampleApi){ setTimeout(()=>renderResult(text,canned.r,{tag:"דוגמה",source:"פירוש לדוגמה שנכתב מראש"}),900); return; }
+    if(sampleApi){
+      const prompt = "את/ה מנוע הפירוש של ONEIRO, שעון מעורר שמקליט חלומות. קרא/י את החלום ותחזיר/י JSON בלבד, בלי טקסט נוסף, במבנה:\n"+
+        '{"title":"כותרת פואטית קצרה","symbols":["3-5 סמלים"],"emotions":["2-4 רגשות"],"interpretation":"3-4 משפטים","insight":"משפט-שניים של תובנה מעשית ליום","question":"שאלה אחת לרפלקציה"}\n'+
+        "כללים: עברית טבעית, פנייה בלשון רבים (אתם) כדי להיות ניטרליים מגדרית. פירוש מנקודות מבט פסיכולוגיות (עיבוד רגשי, יונג, מחקר שינה), חם וסקרן, בלי נבואות, בלי אבחנות ובלי קביעות מוחלטות. אם החלום מטריד או כואב, היו עדינים.\n"+
+        "החלום:\n\"\"\"\n"+text.slice(0,3000)+"\n\"\"\"";
+      try{
+        const res = await sampleApi(prompt,{modelTier:"quick"});
+        const r = parseJSON(res.text||"");
+        renderResult(text,r,{tag:"פירוש חי",source:"פירוש שנוצר עכשיו על ידי Claude"});
+        return;
+      }catch(e){ /* fall through */ }
+    }
+    const r = canned ? canned.r : fallback(text);
+    setTimeout(()=>renderResult(text,r,{tag:canned?"דוגמה":"זיהוי בסיסי",source:canned?"פירוש לדוגמה שנכתב מראש":"זיהוי סמלים מקומי, בלי AI"}),700);
+  }
+  $("#interpBtn").addEventListener("click",interpret);
+
+  // ---------- waterfall ----------
+  const WF=[["מחיר לצרכן",849,"#8b7bf3"],["מע״מ 18%",-130,"#5a5675"],["עלות ייצור מונחת",-390,"#5a5675"],["משלוח, סליקה",-45,"#5a5675"],["החזרות ואחריות",-25,"#5a5675"],["שיווק לכל מכירה (CAC)",-110,"#5a5675"],["רווח תרומה",149,"#ffa640"]];
+  const wf=$("#waterfall");
+  WF.forEach(([l,v,c])=>{const row=el("div","wf"); row.append(el("span",null,l)); const tr=el("div"); const bar=el("div","b"); bar.style.width=(Math.abs(v)/849*100)+"%"; bar.style.background=c; tr.append(bar); row.append(tr); row.append(el("span","num",(v<0?"−":"")+"₪"+Math.abs(v))); row.lastChild.style.textAlign="end"; wf.append(row);});
+
+  // initial phone state: sample 1
+  renderResult(SAMPLES[0].text, SAMPLES[0].r, {tag:"דוגמה",source:"פירוש לדוגמה שנכתב מראש"});
+})();
+</script>
