@@ -4,13 +4,13 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-function dialTexture(maxAniso, dark) {
+function dialTexture(maxAniso, dark, cream) {
   const INK = dark ? '#e8e6e1' : '#1e1e1c', INK2 = dark ? 'rgba(232,230,225,' : 'rgba(30,30,28,';
   const S = 2048, c = document.createElement('canvas'); c.width = c.height = S;
   const g = c.getContext('2d'), R = S / 2;
   g.translate(R, R);
   const grd = g.createRadialGradient(0, -R * .2, R * .1, 0, 0, R);
-  if (dark) { grd.addColorStop(0, '#2a2b2e'); grd.addColorStop(.85, '#222326'); grd.addColorStop(1, '#1a1b1d'); } else { grd.addColorStop(0, '#f7f6f2'); grd.addColorStop(.85, '#efede8'); grd.addColorStop(1, '#e4e1db'); }
+  if (dark) { grd.addColorStop(0, '#2a2b2e'); grd.addColorStop(.85, '#222326'); grd.addColorStop(1, '#1a1b1d'); } else if (cream) { grd.addColorStop(0, '#f3ece0'); grd.addColorStop(.85, '#ebe1d1'); grd.addColorStop(1, '#ddd0bc'); } else { grd.addColorStop(0, '#f7f6f2'); grd.addColorStop(.85, '#efede8'); grd.addColorStop(1, '#e4e1db'); }
   g.fillStyle = grd; g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.fill();
   // fine outer track
   g.strokeStyle = INK2 + '.55)'; g.lineWidth = 2.5;
@@ -46,6 +46,11 @@ function grilleTexture(dark) {
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 }
 
+const FINISHES = {
+  stone:    { body: 0xd9d8d4, rough: .78, hand: 0x1b1b1a, diff: 0xcfccc6, led: 0xc4c1bb, metal: 0xd4d3cf, dial: 'light' },
+  graphite: { body: 0x36373a, rough: .7,  hand: 0xeeede9, diff: 0x2c2d30, led: 0x2c2d30, metal: 0xd4d3cf, dial: 'dark' },
+  mocha:    { body: 0x5a4436, rough: .72, hand: 0x231b16, diff: 0x46352a, led: 0x46352a, metal: 0xd9c7a8, dial: 'cream' },
+};
 const VIOLET = new THREE.Color(0x8a6cf0), AMBER = new THREE.Color(0xffa25e);
 export function createClock(canvas, opts = {}) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: !!opts.preserve });
@@ -65,15 +70,15 @@ export function createClock(canvas, opts = {}) {
   camera.lookAt(target);
 
   const aniso = renderer.capabilities.getMaxAnisotropy();
-  const G = opts.finish === 'graphite';
+  const F = FINISHES[opts.finish] || FINISHES.stone, G = F.dial === 'dark';
   const M = {
-    body: new THREE.MeshPhysicalMaterial({ color: G ? 0x36373a : 0xd9d8d4, roughness: G ? .7 : .78, metalness: 0, clearcoat: .1, clearcoatRoughness: .6 }),
+    body: new THREE.MeshPhysicalMaterial({ color: F.body, roughness: F.rough, metalness: 0, clearcoat: .1, clearcoatRoughness: .6 }),
     plinth: new THREE.MeshStandardMaterial({ color: 0x2a2a2b, roughness: .8 }),
-    champagne: new THREE.MeshStandardMaterial({ color: 0xd4d3cf, metalness: 1, roughness: .32, envMapIntensity: 1.4 }),
-    hand: new THREE.MeshStandardMaterial({ color: G ? 0xeeede9 : 0x1b1b1a, metalness: .1, roughness: .5 }),
+    champagne: new THREE.MeshStandardMaterial({ color: F.metal, metalness: 1, roughness: .32, envMapIntensity: 1.4 }),
+    hand: new THREE.MeshStandardMaterial({ color: F.hand, metalness: .1, roughness: .5 }),
     second: new THREE.MeshStandardMaterial({ color: 0xd9572b, metalness: .2, roughness: .45 }),
-    diffuser: new THREE.MeshStandardMaterial({ color: G ? 0x2c2d30 : 0xcfccc6, roughness: .9, emissive: 0xffa25e, emissiveIntensity: 0 }),
-    led: new THREE.MeshStandardMaterial({ color: G ? 0x2c2d30 : 0xc4c1bb, roughness: .6, emissive: 0xff3b2f, emissiveIntensity: 0 }),
+    diffuser: new THREE.MeshStandardMaterial({ color: F.diff, roughness: .9, emissive: 0xffa25e, emissiveIntensity: 0 }),
+    led: new THREE.MeshStandardMaterial({ color: F.led, roughness: .6, emissive: 0xff3b2f, emissiveIntensity: 0 }),
     glass: new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: .03, metalness: 0, transparent: true, opacity: .16, clearcoat: 1, envMapIntensity: 1.6, depthWrite: false }),
   };
 
@@ -86,7 +91,7 @@ export function createClock(canvas, opts = {}) {
   const FZ = 2.6; // front face
   const diff = add(new THREE.RingGeometry(5.2, 5.38, 160), M.diffuser, false); diff.position.z = FZ + .006;
   const bez = add(new THREE.TorusGeometry(5.0, .07, 24, 180), M.champagne); bez.position.z = FZ + .03;
-  const dial = add(new THREE.CircleGeometry(4.98, 160), new THREE.MeshStandardMaterial({ map: dialTexture(aniso, G), roughness: .85 }), false); dial.position.z = FZ + .012;
+  const dial = add(new THREE.CircleGeometry(4.98, 160), new THREE.MeshStandardMaterial({ map: dialTexture(aniso, G, F.dial === 'cream'), roughness: .85 }), false); dial.position.z = FZ + .012;
 
   function hand(w, len, back, depth, mat, z) {
     const geo = new THREE.BoxGeometry(w, len + back, depth); geo.translate(0, (len - back) / 2, 0);
@@ -145,6 +150,12 @@ export function createClock(canvas, opts = {}) {
       warm.intensity = v * 70;
     },
     setRecording(on) { M.led.emissiveIntensity = on ? 3 : 0; },
+    setFinish(name) {
+      const f = FINISHES[name]; if (!f) return;
+      M.body.color.setHex(f.body); M.body.roughness = f.rough; M.hand.color.setHex(f.hand);
+      M.diffuser.color.setHex(f.diff); M.led.color.setHex(f.led); M.champagne.color.setHex(f.metal);
+      const old = dial.material.map; dial.material.map = dialTexture(aniso, f.dial === 'dark', f.dial === 'cream'); dial.material.needsUpdate = true; old && old.dispose();
+    },
     setExposure(v) { renderer.toneMappingExposure = v; },
     render() { controls && controls.update(); renderer.render(scene, camera); },
     renderer, scene, camera,

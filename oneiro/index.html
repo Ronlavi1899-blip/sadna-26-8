@@ -170,7 +170,11 @@ caption{text-align:start;font-weight:400;font-size:20px;padding-bottom:12px}
 .ref .from{font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;color:var(--faint);text-transform:uppercase}
 .ref .take{border-top:1px solid var(--line);padding-top:12px;font-size:15px}
 .ref .take b{color:var(--accent);font-weight:500}
-.finishes{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.finishes{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.swatches{display:flex;gap:10px;align-items:center}
+.swatches button{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;outline-offset:2px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.swatches button[aria-pressed=true]{border-color:currentColor}
+.swatches span{font-size:13px;opacity:.75}
 .finish{border-radius:24px;overflow:hidden;background:radial-gradient(ellipse at 50% 35%,#f3f1ed,var(--stone) 75%);display:grid}
 .finish img{width:100%;height:auto;display:block}
 .finish .cap{padding:0 22px 20px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -220,7 +224,7 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);color:var(--fain
     <div><span class="v">מחוגים בתנועה שקטה</span><span class="k">מנוע צעד בלי תקתוק, מתכוונן לבד דרך Wi‑Fi</span></div>
     <div><span class="v">טבעת אור זריחה</span><span class="k">20 דקות מסגול לענבר לפני הצליל</span></div>
     <div><span class="v">כפתור כתר להקלטה</span><span class="k">מקליט רק כשלוחצים, עם נורית אדומה</span></div>
-    <div><span class="v">אבן או גרפיט</span><span class="k">גוף מט רך למגע, 16 × 16 × 5.2 ס״מ</span></div>
+    <div><span class="v">אבן, מוקה או גרפיט</span><span class="k">גוף מט רך למגע, 16 × 16 × 5.2 ס״מ</span></div>
   </div>
 </header>
 
@@ -229,7 +233,7 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);color:var(--fain
   <div class="refs">
     <div class="ref"><span class="from">Brick</span><h3>חפץ פשוט שמשנה הרגל</h3><p class="muted">קובייה שלא עושה כלום חוץ מלנעול את הטלפון. ההצלחה שלה היא בתנועה הפיזית: מחליטים עם הגוף, לא עם עוד אפליקציה.</p><p class="take"><b>אצלנו:</b> בוקר בלי טלפון. האפליקציות המסיחות נשארות נעולות עד שלוחצים על הכתר ומספרים את החלום, או עד 20 דקות אחרי ההשכמה.</p></div>
     <div class="ref"><span class="from">WHOOP</span><h3>בלי מסך, ציון אחד, מנוי</h3><p class="muted">צמיד בלי מסך שמחזיר כל בוקר מספר אחד שאכפת לך ממנו. החומרה כלולה בחברות חודשית, והעסק הוא המנוי.</p><p class="take"><b>אצלנו:</b> ציון חלימה יומי, מנוי חודשי שכולל את השעון, ושום מסך על השעון עצמו.</p></div>
-    <div class="ref"><span class="from">Apple</span><h3>עיצוב ומערכת שלמה</h3><p class="muted">מוצר שנראה פשוט כי כל פרט הוחלט. ומוצרים שמדברים זה עם זה, כמו נתוני שינה מהשעון שנכנסים ל־Health.</p><p class="take"><b>אצלנו:</b> שני גימורים בלבד, אריזה שהיא חוויה, וסנכרון עם Apple Health, Apple Watch, Oura ו־WHOOP כדי לדעת מתי אתם בשלב חלימה.</p></div>
+    <div class="ref"><span class="from">Apple</span><h3>עיצוב ומערכת שלמה</h3><p class="muted">מוצר שנראה פשוט כי כל פרט הוחלט. ומוצרים שמדברים זה עם זה, כמו נתוני שינה מהשעון שנכנסים ל־Health.</p><p class="take"><b>אצלנו:</b> שלושה גימורים בלבד, אריזה שהיא חוויה, וסנכרון עם Apple Health, Apple Watch, Oura ו־WHOOP כדי לדעת מתי אתם בשלב חלימה.</p></div>
   </div>
 </section>
 
@@ -245,6 +249,7 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);color:var(--fain
       <canvas id="simCanvas" hidden aria-label="מודל תלת־ממדי של השעון"></canvas>
       <img class="poster" id="poster" src="oneiro-clock.png" alt="השעון בחדר" width="1600" height="1257">
       <div class="hud">
+        <div class="swatches" role="group" aria-label="גימור"><button type="button" data-f="stone" aria-pressed="true" style="background:#d9d8d4" aria-label="אבן"></button><button type="button" data-f="mocha" aria-pressed="false" style="background:#5a4436" aria-label="מוקה"></button><button type="button" data-f="graphite" aria-pressed="false" style="background:#36373a" aria-label="גרפיט"></button><span id="fname">אבן</span></div>
         <div class="timeline" aria-hidden="true"><span id="s1" class="on">לילה</span><span id="s2">זריחה</span><span id="s3">מנגינה</span><span id="s4">ספרו</span><span id="s5">פירוש</span></div>
         <p class="status" id="status"><b>06:57</b> · לילה. האור כבוי והמיקרופון לא מקליט.</p>
         <div class="row">
@@ -289,9 +294,10 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);color:var(--fain
   <div class="sec-head"><span class="label">עיצוב</span><h2>ישן וחדש באותו חפץ</h2><p>החוגה והמחוגים לקוחים משעוני שולחן קלאסיים. הגוף הוא אובייקט רך ושקט, ממשפחת המוצרים שמכירים מוולנס ומטכנולוגיה. אין מסך, אין התראות ויש כפתור אחד.</p></div>
   <div class="finishes">
     <div class="finish"><img src="oneiro-clock.png" width="1600" height="1257" alt="Easy Dreams בגימור אבן: גוף לבן־אפרפר מט וחוגה בהירה"><div class="cap"><h3>אבן</h3><span class="muted">גוף מט לבן־אפרפר, מחוגים שחורים</span></div></div>
+    <div class="finish"><img src="oneiro-mocha.png" width="1600" height="1257" alt="Easy Dreams בגימור מוקה: גוף חום מט וחוגה בצבע שמנת"><div class="cap"><h3>מוקה</h3><span class="muted">חום מט חם, חוגה בצבע שמנת</span></div></div>
     <div class="finish"><img src="oneiro-graphite.png" width="1600" height="1257" alt="Easy Dreams בגימור גרפיט: גוף אפור כהה וחוגה כהה עם מחוגים לבנים"><div class="cap"><h3>גרפיט</h3><span class="muted">גוף אפור כהה, מחוגים לבנים, נעלם בחדר חשוך</span></div></div>
   </div>
-  <p class="note" style="margin-top:18px">בשני הגימורים מחוג השניות כתום, וזה הצבע היחיד. הטבעת, הכתר והמסגרת הדקה עשויים מאלומיניום מוברש. אין לוגו על הגוף, השם מופיע רק על החוגה.</p>
+  <p class="note" style="margin-top:18px">בכל הגימורים מחוג השניות כתום, וזה הצבע היחיד. הטבעת, הכתר והמסגרת הדקה עשויים מאלומיניום מוברש. אין לוגו על הגוף, השם מופיע רק על החוגה.</p>
 </section>
 
 <div class="dark-band">
@@ -567,6 +573,11 @@ try {
     setTimeout(()=>renderResult(text,r,{tag:canned?"דוגמה":"זיהוי בסיסי",source:canned?"פירוש לדוגמה שנכתב מראש":"זיהוי סמלים מקומי, בלי AI"}),800);
   }
   $("#interpBtn").addEventListener("click",interpret);
+  const FN={stone:["אבן","oneiro-clock.png"],mocha:["מוקה","oneiro-mocha.png"],graphite:["גרפיט","oneiro-graphite.png"]};
+  document.querySelectorAll(".swatches button").forEach(b=>b.addEventListener("click",()=>{
+    const f=b.dataset.f; document.querySelectorAll(".swatches button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+    $("#fname").textContent=FN[f][0]; const c=C(); if(c&&c.setFinish) c.setFinish(f); else $("#poster").src=FN[f][1];
+  }));
 
   const WF=[["מחיר לצרכן",449],["מע״מ 18%",-68],["עלות שעון מונחת",-150],["משלוח ללקוח וסליקה",-30],["החזרות ואחריות",-15],["שיווק לכל מכירה",-60],["רווח על כל שעון",126]];
   WF.forEach(([l,v],i)=>{const row=el("div","wf"+(i===0?" first":i===WF.length-1?" last":"")); row.append(el("span",null,l));
