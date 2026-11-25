@@ -563,7 +563,9 @@ footer{padding-block:40px 60px;border-top:1px solid var(--line);color:var(--mute
     startMusic(); $("#muteBtn").hidden=false;
     timers.push(setTimeout(()=>{step(2); status("<b>07:00</b> · מנגינת קופסת נגינה, בעוצמה שעולה לאט. בלי ביפים.");},3600));
     timers.push(setTimeout(()=>{step(3); status("<b>״בוקר טוב. מה חלמת?״</b> · מושכים את הידית ומספרים, לפני שהחלום נעלם.");
-      $("#capture").hidden=false; $("#resetBtn").hidden=false;},7000));
+      $("#capture").hidden=false; $("#resetBtn").hidden=false;
+      if(ttsApi){ try{ if(master&&ctx) master.gain.linearRampToValueAtTime(.08,ctx.currentTime+.6); }catch(e){} ttsApi.speak("בוקר טוב. מה חלמת הלילה?",{voice:"airy",rate:.9,language:"he"}).catch(()=>{}); }
+    },7000));
   });
   $("#muteBtn").addEventListener("click",stopMusic);
   $("#resetBtn").addEventListener("click",()=>{
@@ -577,9 +579,10 @@ footer{padding-block:40px 60px;border-top:1px solid var(--line);color:var(--mute
   SAMPLES.forEach(s=>{const b=el("button",null,"דוגמה: "+s.label); b.type="button"; b.addEventListener("click",()=>{$("#dreamText").value=s.text;}); $("#samples").append(b);});
 
   // ---------- capabilities: dictation + sample ----------
-  let dict=null, sampleApi=null;
+  let dict=null, sampleApi=null; var ttsApi=null;
   const use = (window.claude && window.claude.use) ? n=>window.claude.use(n).catch(()=>null) : ()=>Promise.resolve(null);
   use("sample").then(s=>{sampleApi=s;});
+  use("tts").then(t=>{ttsApi=t;});
   use("dictation").then(d=>{
     if(!d) return; dict=d; const btn=$("#leverBtn"); btn.hidden=false;
     d.onPartial(({text})=>{$("#partial").textContent=text;});
